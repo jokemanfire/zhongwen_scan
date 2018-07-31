@@ -4,11 +4,14 @@
 #include<math.h>
 #include <iostream>
 #include <fstream>
-#include "2d.h"
 #include <vector>
-using namespace cv;
-using namespace std;
-extern void do_main(int ** array2, int rows, int cols);
+#include "the_main.h"
+
+
+#include "bihua.h"
+
+
+
 
 
 
@@ -17,6 +20,36 @@ extern void do_main(int ** array2, int rows, int cols);
 #define src_output_path "D://Users//hubaba//workplace//jpg//m.jpg"
 #define src_bit_path "D://Users//hubaba//workplace//jpg//bit.jpg"
 #define dst_bit_path "D://Users//hubaba//workplace//jpg//bit2.jpg"
+
+
+
+
+
+/*img_print class*/
+
+
+void img_print_test::single_img_print(Mat & src2)
+{
+	for (int row = 0; row < src2.rows; row++)
+	{
+		for (int col = 0; col < src2.cols; col++)
+		{
+
+			int b = src2.at<uchar>(row, col);
+			if (b < 50)
+			{
+				cout << ' ';
+			}
+			else
+			{
+				cout << '1';
+			}
+		}
+		cout << endl;
+	}
+}
+
+/*squre class*/
 class squre_line{
 public:
 	void get_line(int flag,int x1, int x2, int y1, int y2 );
@@ -54,7 +87,11 @@ void squre_line::get_line(int flag, int x1, int x2, int y1, int y2)
 	}
 }
 squre_line line_member; //方块成员
-//获得汉字边界
+
+
+
+
+/*获得边界顶点坐标*/
 void get_border(int ** num,int hight,int width)
 {
 	int count = 0;
@@ -83,7 +120,7 @@ void get_border(int ** num,int hight,int width)
 			break;
 		}
 	}
-	//cout << x1 << y1<<"--" << x2 << y2 << endl;
+
 	count = 0;
 	for (int col = 0; col < width; col++)
 	{
@@ -108,12 +145,172 @@ void get_border(int ** num,int hight,int width)
 			break;
 		}
 	}
-	//cout << x1 << y1 << "--" << x2 << y2 << endl;
+	
 	return;
 }
 
 
-//得到骨架
+//细化算法2
+void zhang_thinimage_improve(Mat &srcimage)//单通道、二值化后的图像  
+{
+	vector<Point> deletelist1;
+	int Zhangmude[9];
+	int nl = srcimage.rows;
+	int nc = srcimage.cols;
+	while (true)
+	{
+		for (int j = 1; j<(nl - 1); j++)
+		{
+			uchar* data_last = srcimage.ptr<uchar>(j - 1);
+			uchar* data = srcimage.ptr<uchar>(j);
+			uchar* data_next = srcimage.ptr<uchar>(j + 1);
+			for (int i = 1; i<(nc - 1); i++)
+			{
+				if (data[i] == 255)
+				{
+					Zhangmude[0] = 1;
+					if (data_last[i] == 255) Zhangmude[1] = 1;
+					else  Zhangmude[1] = 0;
+					if (data_last[i + 1] == 255) Zhangmude[2] = 1;
+					else  Zhangmude[2] = 0;
+					if (data[i + 1] == 255) Zhangmude[3] = 1;
+					else  Zhangmude[3] = 0;
+					if (data_next[i + 1] == 255) Zhangmude[4] = 1;
+					else  Zhangmude[4] = 0;
+					if (data_next[i] == 255) Zhangmude[5] = 1;
+					else  Zhangmude[5] = 0;
+					if (data_next[i - 1] == 255) Zhangmude[6] = 1;
+					else  Zhangmude[6] = 0;
+					if (data[i - 1] == 255) Zhangmude[7] = 1;
+					else  Zhangmude[7] = 0;
+					if (data_last[i - 1] == 255) Zhangmude[8] = 1;
+					else  Zhangmude[8] = 0;
+					int whitepointtotal = 0;
+					for (int k = 1; k < 9; k++)
+					{
+						//得到1的个数
+						whitepointtotal = whitepointtotal + Zhangmude[k];
+					}
+					if ((whitepointtotal >= 2) && (whitepointtotal <= 6))
+					{
+						//得到01的个数
+						int ap = 0;
+						if ((Zhangmude[1] == 0) && (Zhangmude[2] == 1)) ap++;
+						if ((Zhangmude[2] == 0) && (Zhangmude[3] == 1)) ap++;
+						if ((Zhangmude[3] == 0) && (Zhangmude[4] == 1)) ap++;
+						if ((Zhangmude[4] == 0) && (Zhangmude[5] == 1)) ap++;
+						if ((Zhangmude[5] == 0) && (Zhangmude[6] == 1)) ap++;
+						if ((Zhangmude[6] == 0) && (Zhangmude[7] == 1)) ap++;
+						if ((Zhangmude[7] == 0) && (Zhangmude[8] == 1)) ap++;
+						if ((Zhangmude[8] == 0) && (Zhangmude[1] == 1)) ap++;
+						//计算bp
+						int bp = 0;
+						bp += Zhangmude[1];
+						bp += Zhangmude[2] << 1;
+						bp += Zhangmude[3] << 2;
+						bp += Zhangmude[4] << 3;
+						bp += Zhangmude[5] << 4;
+						bp += Zhangmude[6] << 5;
+						bp += Zhangmude[7] << 6;
+						bp += Zhangmude[8] << 7;
+
+						if (ap == 1 || bp == 65 || bp == 5 || bp == 20 || bp == 80 || bp == 13 || bp == 22 || bp == 52 || bp == 133 || bp == 141 || bp == 54)
+						{
+							if ((Zhangmude[1] * Zhangmude[7] * Zhangmude[5] == 0) && (Zhangmude[3] * Zhangmude[5] * Zhangmude[7] == 0))
+							{
+								deletelist1.push_back(Point(i, j));  //满足条件，去除该点
+							}
+						}
+					}
+				}
+			}
+		}
+		if (deletelist1.size() == 0) break;
+		for (size_t i = 0; i < deletelist1.size(); i++)
+		{
+			Point tem;
+			tem = deletelist1[i];
+			uchar* data = srcimage.ptr<uchar>(tem.y);
+			data[tem.x] = 0;
+		}
+		deletelist1.clear();
+
+
+		for (int j = 1; j<(nl - 1); j++)
+		{
+			uchar* data_last = srcimage.ptr<uchar>(j - 1);
+			uchar* data = srcimage.ptr<uchar>(j);
+			uchar* data_next = srcimage.ptr<uchar>(j + 1);
+			for (int i = 1; i<(nc - 1); i++)
+			{
+				if (data[i] == 255)
+				{
+					Zhangmude[0] = 1;
+					if (data_last[i] == 255) Zhangmude[1] = 1;
+					else  Zhangmude[1] = 0;
+					if (data_last[i + 1] == 255) Zhangmude[2] = 1;
+					else  Zhangmude[2] = 0;
+					if (data[i + 1] == 255) Zhangmude[3] = 1;
+					else  Zhangmude[3] = 0;
+					if (data_next[i + 1] == 255) Zhangmude[4] = 1;
+					else  Zhangmude[4] = 0;
+					if (data_next[i] == 255) Zhangmude[5] = 1;
+					else  Zhangmude[5] = 0;
+					if (data_next[i - 1] == 255) Zhangmude[6] = 1;
+					else  Zhangmude[6] = 0;
+					if (data[i - 1] == 255) Zhangmude[7] = 1;
+					else  Zhangmude[7] = 0;
+					if (data_last[i - 1] == 255) Zhangmude[8] = 1;
+					else  Zhangmude[8] = 0;
+					int whitepointtotal = 0;
+					for (int k = 1; k < 9; k++)
+					{
+						whitepointtotal = whitepointtotal + Zhangmude[k];
+					}
+					if ((whitepointtotal >= 2) && (whitepointtotal <= 6))
+					{
+						int ap = 0;
+						if ((Zhangmude[1] == 0) && (Zhangmude[2] == 1)) ap++;
+						if ((Zhangmude[2] == 0) && (Zhangmude[3] == 1)) ap++;
+						if ((Zhangmude[3] == 0) && (Zhangmude[4] == 1)) ap++;
+						if ((Zhangmude[4] == 0) && (Zhangmude[5] == 1)) ap++;
+						if ((Zhangmude[5] == 0) && (Zhangmude[6] == 1)) ap++;
+						if ((Zhangmude[6] == 0) && (Zhangmude[7] == 1)) ap++;
+						if ((Zhangmude[7] == 0) && (Zhangmude[8] == 1)) ap++;
+						if ((Zhangmude[8] == 0) && (Zhangmude[1] == 1)) ap++;
+						int bp = 0;
+						bp += Zhangmude[1];
+						bp += Zhangmude[2] << 1;
+						bp += Zhangmude[3] << 2;
+						bp += Zhangmude[4] << 3;
+						bp += Zhangmude[5] << 4;
+						bp += Zhangmude[6] << 5;
+						bp += Zhangmude[7] << 6;
+						bp += Zhangmude[8] << 7;
+						if (ap == 1 || bp == 65 || bp == 5 || bp == 20 || bp == 80 || bp == 13 || bp == 22 || bp == 52 || bp == 133 || bp == 141 || bp == 54)
+						{
+							if ((Zhangmude[1] * Zhangmude[3] * Zhangmude[5] == 0) && (Zhangmude[3] * Zhangmude[1] * Zhangmude[7] == 0))
+							{
+								deletelist1.push_back(Point(i, j));
+							}
+						}
+					}
+				}
+			}
+		}
+		if (deletelist1.size() == 0) break;
+		for (size_t i = 0; i < deletelist1.size(); i++)
+		{
+			Point tem;
+			tem = deletelist1[i];
+			uchar* data = srcimage.ptr<uchar>(tem.y);
+			data[tem.x] = 0;
+		}
+		deletelist1.clear();
+	}
+}
+
+//细化算法1
 void chao_thinimage(Mat &srcimage)//单通道、二值化后的图像
 {
 	vector<Point> deletelist1;
@@ -271,24 +468,26 @@ void get_bihua(const char path[100]) //获得二值图像
 
 	split(src, channels);
 	src2 = channels.at(1);
+
+	/*图像单值化处理*/
 	for (int row = 0; row < src2.rows; row++)
 	{
 		for (int col = 0; col < src2.cols; col++)
 		{
 
-			int b = src2.at<uchar>(row,col);
+			int b = src2.at<uchar>(row, col);
 			array1[row][col] = b;
-			if (array1[row][col] < 50)
+			if (array1[row][col] < 30)
 			{
 				src2.at<uchar>(row, col) = 255;
 				array2[row][col] = 1;
 				std::cout << '1';
 			}
-				
+
 			else
 			{
-				src2.at<uchar>(row, col) =0;
-	
+				src2.at<uchar>(row, col) = 0;
+
 				array2[row][col] = 0;
 				std::cout << '0';
 			}
@@ -299,32 +498,21 @@ void get_bihua(const char path[100]) //获得二值图像
 	std::cout << endl;
 	line_member.print_line();  
 
-	//保存单通道图像
+	//调用细化算法1
 	imshow("3",src2);
-	chao_thinimage(src2);
-	for (int row = 0; row < src2.rows; row++)
-	{
-		for (int col = 0; col < src2.cols; col++)
-		{
+	zhang_thinimage_improve(src2);
 
-			int b = src2.at<uchar>(row, col);
-			array1[row][col] = b;
-			if (array1[row][col] < 50)
-			{
-				cout << ' ';
-			}
 
-			else
-			{
-				cout << '1';
-			}
-		}
-		cout << endl;
-	}
+
+	//print
+	img_print_test my_print;
+	my_print.single_img_print(src2);
+
+	//保存图像
 	imwrite(dst_bit_path,src2);
 	imshow("4", src2);
 	// 调用笔画获取的主函数
-	//do_main(array2, src.rows, src.cols);
+	do_main(src2);
 }
 
 void get_binary_file(const char  filename1[100], const char filename2[100]) //获得二进制文件
@@ -442,10 +630,17 @@ int new_img(const char path[100]) //获得灰度图像
 
 int main()
 {
+
 	//像素操作
 	new_img(src_input_path);
-	     //get_binary_file("D://Users//hubaba//workplace//jpg//4.jpg", "D://Users//hubaba//workplace//jpg//1.bin");
+  //get_binary_file("D://Users//hubaba//workplace//jpg//4.jpg", "D://Users//hubaba//workplace//jpg//1.bin");
 	get_bihua(src_output_path);
+
+
+	/*Mat bit_img;
+	bit_img = imread(dst_bit_path);
+	do_main(bit_img);
+	*/
 	waitKey();
 
 }

@@ -15,38 +15,45 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="signed.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="http_post.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="main_gui.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="bihua.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="check.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="the_main.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="signed.h">
-      <Filter>源文件</Filter>
-    </ClInclude>
-    <ClInclude Include="bihua.h">
+    <ClInclude Include="MFCApplication1.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="the_main.h">
+    <ClInclude Include="MFCApplication1Dlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\..\..\workplace\jpg\bit2.jpg">
+    <ClCompile Include="MFCApplication1.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MFCApplication1Dlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MFCApplication1.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\MFCApplication1.rc2">
+      <Filter>资源文件</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\MFCApplication1.ico">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>
