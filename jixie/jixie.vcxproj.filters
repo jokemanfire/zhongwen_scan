@@ -35,13 +35,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="signed.h">
-      <Filter>源文件</Filter>
-    </ClInclude>
     <ClInclude Include="bihua.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="the_main.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="signed.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
