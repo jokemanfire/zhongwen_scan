@@ -21,9 +21,6 @@
     <ClCompile Include="http_post.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="main_gui.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="bihua.cpp">
       <Filter>源文件</Filter>
     </ClCompile>

@@ -6,8 +6,6 @@
 #include <fstream>
 #include <vector>
 #include "the_main.h"
-
-
 #include "bihua.h"
 
 
@@ -16,14 +14,14 @@
 
 
 
-#define src_input_path "D://Users//hubaba//workplace//jpg//2.jpg"
+#define src_input_path "D://Users//hubaba//workplace//jpg//3.jpg"
 #define src_output_path "D://Users//hubaba//workplace//jpg//m.jpg"
 #define src_bit_path "D://Users//hubaba//workplace//jpg//bit.jpg"
 #define dst_bit_path "D://Users//hubaba//workplace//jpg//bit2.jpg"
 
 
 
-
+String bi_hua_path = "D://Users//hubaba//workplace//bi//";  //保存笔画的路径
 
 /*img_print class*/
 
@@ -447,6 +445,22 @@ void chao_thinimage(Mat &srcimage)//单通道、二值化后的图像
 	}
 }
 
+
+//图像保存
+void create_jpg(bi_hua * bi, Mat & srcimage,string path)
+{
+	for(int i=0;i<max_size;i++)
+		for (int j = 0; j < max_size; j++)
+		{
+			if (bi->self[i][j] == 1||bi->self[i][j] == 2)
+				srcimage.at<uchar>(i, j) = 0;
+			else
+				srcimage.at<uchar>(i, j) = 255;
+		}
+	imshow("ff", srcimage);
+	imwrite(path, srcimage);
+}
+
 void get_bihua(const char path[100]) //获得二值图像  
 {
 	Mat src;
@@ -511,8 +525,36 @@ void get_bihua(const char path[100]) //获得二值图像
 	//保存图像
 	imwrite(dst_bit_path,src2);
 	imshow("4", src2);
+
 	// 调用笔画获取的主函数
-	do_main(src2);
+	bi_hua * my_bi; //获得笔画骨架
+	my_bi = do_main(src2);
+	bi_hua * head;
+	head = my_bi;
+
+	int array3[max_size][max_size];
+	for(int i=0;i<max_size;i++)
+		for (int j = 0; j < max_size; j++)
+		{
+			array3[i][j] = array2[i][j];
+		}
+	//将笔画骨架还原
+	get_before(my_bi, array3);
+	/*保存笔画到图片*/
+	//去掉重复笔画
+	my_bi = head;
+	char f = '1';
+	while (my_bi != NULL)
+	{
+		Mat srcf(max_size,max_size, CV_8UC1);
+		string my_path;
+		my_path = bi_hua_path + f + ".jpg";
+		cout << my_path;
+		create_jpg(my_bi,srcf,my_path);
+		f++;
+		my_bi = my_bi->next;
+	}
+
 }
 
 void get_binary_file(const char  filename1[100], const char filename2[100]) //获得二进制文件
@@ -575,7 +617,7 @@ void get_binary_file(const char  filename1[100], const char filename2[100]) //获
 	fclose(fpr);
 
 	imshow("1", image2);
-	waitKey(0);
+
 }
 
 

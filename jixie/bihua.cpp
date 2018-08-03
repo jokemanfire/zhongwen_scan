@@ -8,7 +8,7 @@
 #include<vector>
 #include "the_main.h"
 
-#define max 100
+
 
 
 
@@ -19,25 +19,17 @@ public:
 	int x, y;
 };
 
-class bi_hua
-{
-public:
-	int flag = 0;
 
-	int self[max][max] = { 0 };
-	bi_hua * next=NULL;
-	bi_hua * head=NULL;
-	bi_hua & operator=(bi_hua & coper); //笔画复制操作符重载
-	
-};
 bi_hua & bi_hua::operator=(bi_hua & coper)
 {
 	
-	for(int i=0;i<max;i++)
-		for (int j = 0; j < max; j++)
+	for(int i=0;i<max_size;i++)
+		for (int j = 0; j < max_size; j++)
 		{
 			if (coper.self[i][j] == 1)
 				this->self[i][j] = 1;
+			else if (coper.self[i][j] == 2)
+				this->self[i][j] = 2;
 		}
 	return * this;
 }
@@ -45,7 +37,7 @@ class one_room
 {
 public:                                                   
 	void get_room(int * * img, int x, int y, int w, int h);
-	void get_room(int img[max][max], int x, int y, int w, int h);
+	void get_room(int img[max_size][max_size], int x, int y, int w, int h);
 	
 	int neighbor[8] = { 0 };
 	neighborhood nerghbord[8];
@@ -103,7 +95,7 @@ void one_room::get_room(int * * img, int x, int y,int w,int h)
 	return;
 }
 
-void one_room::get_room(int img[max][max], int x, int y, int w, int h)
+void one_room::get_room(int img[max_size][max_size], int x, int y, int w, int h)
 {
 	width = w;
 	high = h;
@@ -238,7 +230,7 @@ void combine_bihua(bi_hua * yuan1,bi_hua * yuan2,bi_hua * bi_yuan)
 				head2_2 = head2_2->next;
 				continue;
 			}
-			if (fabs(slope1-slope2) <0.37 && head1_2->flag != 0 &&head1 != head1_2) //对斜率进行判定
+			if (fabs(slope1-slope2) <0.26 && head1_2->flag != 0 &&head1 != head1_2) //对斜率进行判定
 			{
 				if (is_in(head1, head1_2) == true)  //对交叉点进行判定
 				{
@@ -277,7 +269,7 @@ void combine_bihua(bi_hua * yuan1,bi_hua * yuan2,bi_hua * bi_yuan)
 bi_hua * get_one_hua(int ** arry,int x,int y,bi_hua * new_bi)
 {
 	one_room new_room;
-	new_room.get_room(arry, x, y, max, max);
+	new_room.get_room(arry, x, y, max_size, max_size);
 	if (count_point(new_room) == 0)
 	{
 		new_bi->self[x][y] = 1;
@@ -299,8 +291,8 @@ bi_hua * get_one_hua(int ** arry,int x,int y,bi_hua * new_bi)
 bool is_none(bi_hua * bi)
 {
 	int count = 0;
-	for (int i = 0; i < max; i++)
-		for (int j = 0; j < max; j++)
+	for (int i = 0; i <max_size; i++)
+		for (int j = 0; j < max_size; j++)
 			if (bi->self[i][j] == 1)
 				count++;
 	if (count == 0||count<=2)
@@ -310,21 +302,30 @@ bool is_none(bi_hua * bi)
 }
 
 /*剔除多余交点*/
-bi_hua * delet_more(bi_hua * bi, int x, int y, int array1[max][max] = { 0 })
+bi_hua * delet_more(bi_hua * bi, int x, int y, int array1[max_size][max_size] = { 0 })
 {
 	one_room new_room;
-	new_room.get_room(array1, x, y, max, max);
+	new_room.get_room(array1, x, y, max_size, max_size);
 	if (count_point2(new_room) == 0)
 		return bi;
 	
-	for(int k=0;k<8;k++)
-	      if (new_room.neighbor[k] == 1||new_room.neighbor[k] == 2)
-		  {
-			  array1[x][y] = 0;
-			  bi->self[x][y] = 3;
-			  bi->flag = 1;
-			  delet_more(bi, new_room.nerghbord[k].x, new_room.nerghbord[k].y,array1);
-		  }
+	for (int k = 0; k < 8; k++)
+	{
+		if (new_room.neighbor[k] == 1)
+		{
+			array1[x][y] = 0;
+			bi->self[x][y] = 3;
+			bi->flag = 1;
+			delet_more(bi, new_room.nerghbord[k].x, new_room.nerghbord[k].y, array1);
+		}
+		else if (new_room.neighbor[k] == 2)
+		{
+			array1[x][y] = 0;
+			bi->self[x][y] = 4;
+			bi->flag = 1;
+			delet_more(bi, new_room.nerghbord[k].x, new_room.nerghbord[k].y, array1);
+		}
+	}
 		
 }
 
@@ -336,10 +337,10 @@ float get_slope(bi_hua * bi,int flag)
 	int count = 0;
 	float slope=0;
 	float slope2 = 0;
-	for(int i=0;i<max;i++)
-		for (int j = 0; j < max; j++)
+	for(int i=0;i<max_size;i++)
+		for (int j = 0; j < max_size; j++)
 		{
-			new_room.get_room(bi->self, i, j, max, max);
+			new_room.get_room(bi->self, i, j, max_size, max_size);
 			if (count_point(new_room) == 1 && bi->self[i][j] == 1)
 			{
 				if (count == 0)
@@ -371,10 +372,10 @@ float get_slope(bi_hua * bi,int flag)
 //判断重合
 bool is_in(bi_hua * bi_1, bi_hua * bi_2)
 {
-	for (int i = 0; i<max; i++)
-		for (int j = 0; j < max; j++)
+	for (int i = 0; i<max_size; i++)
+		for (int j = 0; j < max_size; j++)
 		{
-			if (bi_1->self[i][j] == bi_2->self[i][j]&& bi_1->self[i][j] == 1)
+			if (bi_1->self[i][j] == bi_2->self[i][j]&& bi_1->self[i][j] ==2)
 			{
 				return true;
 			}
@@ -394,9 +395,9 @@ void print_bihua(bi_hua * head)
 			continue;
 		}
 		cout << "打印壁画" << endl;
-		for (int i = 0; i < max; i++)
+		for (int i = 0; i < max_size; i++)
 		{
-			for (int j = 0; j <max; j++)
+			for (int j = 0; j <max_size; j++)
 				{
 					if (print_bi->self[i][j] == 1)
 						cout << '1';
@@ -421,9 +422,9 @@ void print_bihua2(bi_hua * head)
 	if (is_none(print_bi) == false)
 		return ;
 	cout << "该壁画开始" << endl;
-		for (int i = 0; i < max; i++)
+		for (int i = 0; i < max_size; i++)
 		{
-			for (int j = 0; j < max; j++)
+			for (int j = 0; j < max_size; j++)
 			{
 				if (print_bi->self[i][j] == 1)
 					cout << '1';
@@ -466,7 +467,7 @@ int count_point2(one_room new_room)
 
 
 //交点处理
-int do_main(Mat &srcimage) //传递的为单通道图像
+bi_hua * do_main(Mat &srcimage) //传递的为单通道图像
 {
 	int col, row;
 	col = srcimage.cols;
@@ -516,7 +517,7 @@ int do_main(Mat &srcimage) //传递的为单通道图像
 		}
 	
 	/*标记删除交点坐标*/
-	int flag[max][max] = { 0 };
+	int flag[max_size][max_size] = { 0 };
 	for(int i=0;i<row;i++)
 		for (int j = 0; j <col; j++)
 		{
@@ -630,56 +631,14 @@ int do_main(Mat &srcimage) //传递的为单通道图像
 	//print_bihua(head);
 
 
-	/*调试查看零散笔画
-	 input_bi = head;
-	while (input_bi != NULL)
-	{
-		for (int i = 0; i < row; i++)
-		{
-			for (int j = 0; j < col; j++)
-			{
-
-				if (input_bi->self[i][j] == 1)
-				{
-					array2[i][j] = 1;
-				}
-				else if (input_bi->self[i][j] == 2)
-				{
-					array2[i][j] = 2;
-				}
-			}
-		}
-
-		input_bi = input_bi->next;
-	}
-	cout << "调试" << endl;
-	for (int i = 0; i < row; i++)
-	{
-		for (int j = 0; j < col; j++)
-		{
-
-			if (array2[i][j] == 1)
-			{
-				cout << '1';
-			}
-			else if (array2[i][j] == 2)
-			{
-				cout << ' ';
-			}
-			else
-				cout << ' ';
-		}
-		cout << endl;
-	}
-	*/
 	/*剔除多余交点*/
 	input_bi = head;
 	while (input_bi != NULL)
 	{
-		int array1[max][max] = { 0 };
+		int array1[max_size][max_size] = { 0 };
 		
-		for (int k = 0; k < max; k++)
-			for (int f = 0; f < max; f++)
+		for (int k = 0; k < max_size; k++)
+			for (int f = 0; f < max_size; f++)
 				array1[k][f] = input_bi->self[k][f];
 		for (int i = 0; i < row; i++)
 		{
@@ -697,13 +656,15 @@ int do_main(Mat &srcimage) //传递的为单通道图像
 	input_bi = head;
 	while (input_bi != NULL)
 	{
-		for (int i = 0; i < max; i++)
-			for (int j = 0; j < max; j++)
+		for (int i = 0; i < max_size; i++)
+			for (int j = 0; j < max_size; j++)
 			{
-				if (input_bi->self[i][j] != 3)
+				if (input_bi->self[i][j] == 2)
 					input_bi->self[i][j] = 0;
 				else if (input_bi->self[i][j] == 3)
 					input_bi->self[i][j] = 1;
+				else if (input_bi->self[i][j] == 4)
+					input_bi->self[i][j] = 2;
 			}
 		input_bi = input_bi->next;
 	}
@@ -722,17 +683,104 @@ int do_main(Mat &srcimage) //传递的为单通道图像
 
 	cout << "合并开始:" << endl;
 	combine_bihua(now_bi, jisuan_old_bi, head2);
+	
 	/*print 测试*/
 	bi_hua * print_bi = head2;
-	print_bihua(print_bi);
-	
+	//print_bihua(print_bi);
+	cout << "end" << endl;
 	/*笔画还原*/
 	
 	
-	cout << "end" << endl;
-	return 1;
+	return head2;
 }
 
 
+//迭代法笔画还原
+void bi_hua_before(int array2[max_size][max_size], bi_hua * do_head,int x, int y)
+{
+	one_room new_room;
+	one_room other_room;
+	new_room.get_room(array2, x, y, max_size, max_size);
+	other_room.get_room(do_head->self, x, y, max_size,max_size);
+	if (count_point(new_room) == 0)
+	{
+		do_head->self[x][y] = 1;
+		return;
+	}
+	for (int i = 0; i < 8; i++)
+		if (other_room.neighbor[i] == 2)
+		{
+			do_head->self[x][y] = 1;
+			return;
+		}
+
+	for(int i=0;i<8;i++)
+		if (new_room.neighbor[i] == 1)
+		{
+			array2[x][y] = 0;
+			do_head->self[x][y] = 1;
+			bi_hua_before(array2, do_head, new_room.nerghbord[i].x, new_room.nerghbord[i].y);
+		}
+}
+
+//笔画还原处理
+void get_before(bi_hua * head, int array2[max_size][max_size] )
+{
+	bi_hua * do_head = head;
+	vector< vector<int> > array1(max_size);
+	for (int i = 0; i<max_size; i++)
+		array1[i].resize(max_size);
 
 
+
+
+	while (do_head != NULL) //扩大交点腐蚀
+	{
+		for (int i = 0; i < max_size; i++)
+			for (int j = 0; j < max_size; j++)
+				array1[i][j] = 0;
+		for(int i=0;i<max_size;i++)
+			for (int j = 0; j < max_size; j++)
+			{
+				if (do_head->self[i][j] == 2)
+				{
+					one_room new_room;
+					new_room.get_room(do_head->self, i, j, max_size, max_size);
+					array1[i][j] = 5;
+					for (int m = 0; m < 8; m++)
+					{
+						array1[new_room.nerghbord[m].x][new_room.nerghbord[m].y] = 5;
+					}
+						
+				}
+			}
+		for (int i = 0; i<max_size; i++)
+			for (int j = 0; j < max_size; j++)
+			{
+				if (array1[i][j] == 5)
+					do_head->self[i][j] = 2;
+			}
+		do_head = do_head->next;
+	}
+	
+	//运用迭代法还原处理
+	do_head = head;
+	while (do_head != NULL)
+	{
+		int arry3[max_size][max_size];
+		for (int i = 0; i<max_size; i++)
+			for (int j = 0; j < max_size; j++)
+			{
+				arry3[i][j] = array2[i][j];
+			}
+		for(int i=0;i<max_size;i++)
+			for (int j = 0; j < max_size; j++)
+			{
+				if (do_head->self[i][j] == 1)
+					bi_hua_before(arry3, do_head,i,j);
+			}
+		do_head = do_head->next;
+	}
+	//print_bihua(head);
+
+}

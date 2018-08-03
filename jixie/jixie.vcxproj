@@ -134,7 +134,6 @@
     <ClCompile Include="bihua.cpp" />
     <ClCompile Include="check.cpp" />
     <ClCompile Include="http_post.cpp" />
-    <ClCompile Include="main_gui.cpp" />
     <ClCompile Include="signed.cpp" />
     <ClCompile Include="the_main.cpp" />
   </ItemGroup>

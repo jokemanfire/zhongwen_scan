@@ -1,10 +1,23 @@
 #pragma once
 #include <opencv2/opencv.hpp>
+#define max_size 100
 using namespace cv;
 
-int do_main(Mat &srcimage);
-//int iss_none(int arry2[3][3]);
 
+//int iss_none(int arry2[3][3]);
+class bi_hua
+{
+public:
+	int flag = 0;
+
+	int self[max_size][max_size] = { 0 };
+	bi_hua * next = NULL;
+	bi_hua * head = NULL;
+	bi_hua & operator=(bi_hua & coper); //±Ê»­¸´ÖÆ²Ù×÷·ûÖØÔØ
+
+};
+bi_hua * do_main(Mat &srcimage);
+void get_before(bi_hua * head, int array2[max_size][max_size]);
 class lines {
 public:
 	lines(int x1 = 0, int y1 = 0, int x2 = 0, int y2 = 0) :startp_x(x1), startp_y(y1), endp_x(x2), endp_y(y2) {};
