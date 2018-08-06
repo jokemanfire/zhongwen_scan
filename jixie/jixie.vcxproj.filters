@@ -41,6 +41,9 @@
     <ClInclude Include="signed.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="http_post.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\workplace\jpg\bit2.jpg">

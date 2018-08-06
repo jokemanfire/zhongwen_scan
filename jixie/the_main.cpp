@@ -7,14 +7,14 @@
 #include <vector>
 #include "the_main.h"
 #include "bihua.h"
+#include <random>
 
 
 
 
 
 
-
-#define src_input_path "D://Users//hubaba//workplace//jpg//3.jpg"
+#define src_input_path "D://Users//hubaba//workplace//jpg//de.bmp"
 #define src_output_path "D://Users//hubaba//workplace//jpg//m.jpg"
 #define src_bit_path "D://Users//hubaba//workplace//jpg//bit.jpg"
 #define dst_bit_path "D://Users//hubaba//workplace//jpg//bit2.jpg"
@@ -543,15 +543,18 @@ void get_bihua(const char path[100]) //获得二值图像
 	/*保存笔画到图片*/
 	//去掉重复笔画
 	my_bi = head;
-	char f = '1';
-	while (my_bi != NULL)
+	int rd = 1;
+	char str[10000];
+	
+	while (my_bi->next != NULL)
 	{
 		Mat srcf(max_size,max_size, CV_8UC1);
 		string my_path;
-		my_path = bi_hua_path + f + ".jpg";
+		sprintf(str, "%d",rd);
+		my_path = bi_hua_path + str + ".jpg";
 		cout << my_path;
+		rd++;
 		create_jpg(my_bi,srcf,my_path);
-		f++;
 		my_bi = my_bi->next;
 	}
 

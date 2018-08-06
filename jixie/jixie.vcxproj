@@ -139,6 +139,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bihua.h" />
+    <ClInclude Include="http_post.h" />
     <ClInclude Include="signed.h" />
     <ClInclude Include="the_main.h" />
   </ItemGroup>

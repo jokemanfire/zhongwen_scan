@@ -26,9 +26,11 @@ char* U2G(const char* utf8)
 	if (wstr) delete[] wstr;
 	return str;
 }
-//正则表达式
 
-void get_word(char buf[1024*1024])
+string my_key;
+
+//正则表达式
+string  get_word(char buf[1024*1024])
 {
 	regex reg1("\"character\":\"(.{1,2})\",\"confidence\"");
 	smatch r1;
@@ -38,7 +40,7 @@ void get_word(char buf[1024*1024])
 	cout << "正则：" << endl;
 	cout << r1.str(1)<< endl;
 	
-	return;
+	return r1.str(1);
 }
 class HttpConnect
 {
@@ -103,7 +105,9 @@ void HttpConnect::socketHttp(std::string host, std::string request)
 	buf[offset] = 0;
 	buf2 = U2G(buf);
 	std::cout << buf2 << std::endl;
-	get_word(buf2);
+	string key_wd;
+	key_wd = get_word(buf2);
+	my_key = key_wd;
 }
 void HttpConnect::postData(std::string host, std::string path, std::string post_content,std::string auth)
 {
@@ -160,7 +164,7 @@ void HttpConnect::getData(std::string host, std::string path, std::string get_co
 }
 
 //调用腾讯ocr
-int http_post()
+string  http_post()
 {
 
 	std::string sta;
@@ -197,5 +201,5 @@ int http_post()
 	//http.getData("116.31.68.142","/ocr/handwriting", "");
 	//http.postData_img("116.31.68.142", "/ocr/handwriting", ImgBuffer, sta);
 	getchar();
-	return 0;
+	return my_key;
 }

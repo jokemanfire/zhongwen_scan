@@ -10,7 +10,7 @@
 
 
 
-
+using namespace std;
 
 class neighborhood
 {
@@ -33,6 +33,43 @@ bi_hua & bi_hua::operator=(bi_hua & coper)
 		}
 	return * this;
 }
+
+bi_hua * bi_hua::delete_self()
+{
+	bi_hua * temp;
+	if (this->next != NULL)
+	{
+		temp = this->next;
+		if (this->before != NULL)
+		{
+			this->before->next = temp;
+			delete this;
+			return temp;
+		}
+		else
+		{
+			delete this;
+			return temp;
+		}
+	}
+	else
+	{
+		temp = this->before;
+		this->before->next = NULL;
+		delete this;
+		return temp;
+	}
+}
+
+bi_hua * create_next(bi_hua * head)
+{
+	head->next = new bi_hua;
+	head->next->flag = 1;
+	head->next->before = head;
+	return head->next;
+	
+}
+
 class one_room
 {
 public:                                                   
@@ -152,118 +189,53 @@ bool is_none(bi_hua * bi);
 void print_bihua2(bi_hua * head);
 /*笔画合并函数*/
 
-void combine_bihua(bi_hua * yuan1,bi_hua * yuan2,bi_hua * bi_yuan)
+void combine_bihua(bi_hua * yuan1,bi_hua * yuan2)
 {
-	bi_hua * head1= yuan1;   //head1为有交点  head2为无交点
-	bi_hua * head1_2 = yuan1;
-	bi_hua * head2 = yuan2;
-	bi_hua * head2_2 = yuan2;
-	float slope1 = 0;
-	float slope2 = 0;
+	bi_hua * now_bi = yuan1;
+	bi_hua * now_bi1 = yuan2;
+	bi_hua * second_bi = yuan1;
+	bi_hua * second_bi1 = yuan2;//yuan1有交点，yuan2无交点
 
-	
-	bi_hua * bi_result = bi_yuan;
-	
-	while (head1 != NULL)   /*第一轮迭代*/
+	float now_bi_slope=0;
+	float second_bi_slope=0;
+
+	while (now_bi != NULL)
 	{
-		head1_2 = yuan1;
-		head2_2 = yuan2;
-		slope1 = get_slope(head2,1);
-		if (slope1 == 500000)
+		
+		now_bi_slope = get_slope(now_bi1,1);
+		if (now_bi_slope == 500000)
 		{
-			head1 = head1->next;
-			head2 = head2->next;
+			now_bi1 = now_bi1->next;
+			now_bi = now_bi->next;
 			continue;
 		}
-		while (head1_2 != NULL)
+		second_bi = yuan2;
+		second_bi1 = yuan1;
+		while (second_bi != NULL)
 		{
-			slope2 = get_slope(head2_2,1);
-			if (slope2 == 500000)
-			{
-				head1_2 = head1_2->next;
-				head2_2 = head2_2->next;
-				continue;
-			}
-			if (fabs(slope1 - slope2)<0.37 && head1_2->flag != 0 ) //对斜率进行判定
-			{
-				if (is_in(head1, head1_2) == true&&head1!= head1_2&& head1_2->flag == 1)  //对交叉点进行判定
-				{
-					//cout << "the before 1" << endl;
-					//print_bihua2(head1);
-					*bi_result = *head1;
-					*bi_result = *head1_2;
-					//cout << "the second " << endl;
-					//print_bihua2(head1_2);
-					//print_bihua2(bi_result);
-					bi_result->next = new bi_hua;
-					bi_result->flag = 1;
-					bi_result = bi_result->next;
-					head1->flag = 0;
-				}
-			}
-			head1_2 = head1_2->next;
-			head2_2 = head2_2->next;
-		}
-		head1 = head1->next;
-		head2 = head2->next;
-	}
+			print_bihua2(second_bi);
 
-	head1 = yuan1;
-	head2 = yuan2;
-	while (head1 != NULL)  /*第二轮迭代*/
-	{
-		head1_2 = yuan1;
-		head2_2 = yuan2;
-		slope1 = get_slope(head2,2);
-		if (slope1 == 500000)
-		{
-			head1 = head1->next;
-			head2 = head2->next;
-			continue;
-		}
-		while (head1_2 != NULL)
-		{
-			slope2 = get_slope(head2_2,2);
-			if (slope2 == 500000)
+			second_bi_slope = get_slope(second_bi1, 1);
+			if (second_bi_slope != 500000 &&fabs(now_bi_slope - second_bi_slope) < 0.27&& second_bi != now_bi)
 			{
-				head1_2 = head1_2->next;
-				head2_2 = head2_2->next;
-				continue;
-			}
-			if (fabs(slope1-slope2) <0.26 && head1_2->flag != 0 &&head1 != head1_2) //对斜率进行判定
-			{
-				if (is_in(head1, head1_2) == true)  //对交叉点进行判定
+				if (is_in(now_bi, second_bi) == true)
 				{
-					*bi_result = *head1;
-					*bi_result = *head1_2;
-					//print_bihua2(bi_result);
-					bi_result->next = new bi_hua;
-					bi_result->flag = 1;
-					bi_result = bi_result->next;
-					head1->flag = 0;
+					*now_bi = *second_bi;
+					second_bi = second_bi->delete_self();
+					second_bi1 = second_bi1->delete_self();
+					now_bi->flag = 0;
+					combine_bihua(yuan1, yuan2);
+					continue;
+					
 				}
 			}
-			head1_2 = head1_2->next;
-			head2_2 = head2_2->next;
+			second_bi = second_bi->next;
+			second_bi1 = second_bi1->next;
 		}
-		head1 = head1->next;
-		head2 = head2->next;
+		now_bi1 = now_bi1->next;
+		now_bi = now_bi->next;
 	}
-	head1 = yuan1;
 	
-	while (head1 != NULL)
-	{
-		if (head1->flag == 1 && is_none(head1))
-		{
-			*bi_result = *head1;
-			bi_result->flag = 1;
-			bi_result->next = new bi_hua;
-			bi_result = bi_result->next;
-			
-		}
-		head1 = head1->next;
-	}
-	return;
 }
 /*获得其中一个笔画*/
 bi_hua * get_one_hua(int ** arry,int x,int y,bi_hua * new_bi)
@@ -290,10 +262,11 @@ bi_hua * get_one_hua(int ** arry,int x,int y,bi_hua * new_bi)
 /*判断提取的笔画是否为空*/
 bool is_none(bi_hua * bi)
 {
+	bi_hua * had=bi;
 	int count = 0;
 	for (int i = 0; i <max_size; i++)
 		for (int j = 0; j < max_size; j++)
-			if (bi->self[i][j] == 1)
+			if (had->self[i][j] == 1)
 				count++;
 	if (count == 0||count<=2)
 		return false;
@@ -359,12 +332,18 @@ float get_slope(bi_hua * bi,int flag)
 		return 500000;
 	else
 	{
-		if(flag == 1)
-		slope = fabs(x2 - x1) / fabs(y2 - y1);
-		return slope;
-		if(flag == 2)
-		slope2 = fabs(y2 - y1) / fabs(x2 - x1);
-		return slope2;
+		if (flag == 1 && y2 - y1 != 0)
+		{
+			slope = (x2 - x1) / (y2 - y1);
+			return slope;
+		}
+		else if (flag == 2 && x2 - x1 != 0)
+		{
+			slope2 = (y2 - y1) / (x2 - x1);
+			return slope2;
+		}
+		else
+			return 500000;
 	}
 }
 
@@ -394,21 +373,21 @@ void print_bihua(bi_hua * head)
 			print_bi = print_bi->next;
 			continue;
 		}
-		cout << "打印壁画" << endl;
+		std::cout << "打印壁画" << endl;
 		for (int i = 0; i < max_size; i++)
 		{
 			for (int j = 0; j <max_size; j++)
 				{
 					if (print_bi->self[i][j] == 1)
-						cout << '1';
+						std::cout << '1';
 					else if (print_bi->self[i][j] == 2)
-						cout << '2';
+						std::cout << '2';
 					else
-						cout << ' ';
+						std::cout << ' ';
 				}
-			cout << endl;
+			std::cout << endl;
 		}
-		cout << "该壁画结束" << endl;
+		std::cout << "该壁画结束" << endl;
 		print_bi = print_bi->next;
 	}
 
@@ -421,21 +400,21 @@ void print_bihua2(bi_hua * head)
 	bi_hua * print_bi= head;
 	if (is_none(print_bi) == false)
 		return ;
-	cout << "该壁画开始" << endl;
+	std::cout << "该壁画开始" << endl;
 		for (int i = 0; i < max_size; i++)
 		{
 			for (int j = 0; j < max_size; j++)
 			{
 				if (print_bi->self[i][j] == 1)
-					cout << '1';
+					std::cout << '1';
 				else if (print_bi->self[i][j] == 2)
-					cout << '2';
+					std::cout << '2';
 				else
-					cout << ' ';
+					std::cout << ' ';
 			}
-			cout << endl;
+			std::cout << endl;
 		}
-		cout << "该壁画结束" << endl;
+		std::cout << "该壁画结束" << endl;
 	
 }
 //得到周围8点的权值不包括标记为2的点
@@ -539,7 +518,7 @@ bi_hua * do_main(Mat &srcimage) //传递的为单通道图像
 				array1[i][j] = 2;
 			}
 		}
-		cout << endl;
+		std::cout << endl;
 	}
 
 	/*将交点提取后的零散点放入*/
@@ -561,12 +540,12 @@ bi_hua * do_main(Mat &srcimage) //传递的为单通道图像
 		{
 			if (array1[i][j] == 1)
 			{
-				cout << '1';
+				std::cout << '1';
 			}
 			else
-				cout << ' ';
+				std::cout << ' ';
 		}
-		cout << endl;
+		std::cout << endl;
 	}
 	
 	
@@ -587,29 +566,20 @@ bi_hua * do_main(Mat &srcimage) //传递的为单通道图像
 			if (array1[i][j] == 1)
 			{
 				get_one_hua(array1, i, j, new_bi);
-				new_bi->next = new bi_hua;
-				new_bi = new_bi->next;
-				new_bi->head = head;
+				new_bi = create_next(new_bi);
 			}
 		}
 	}
+	//print_bihua(head);
 	/*复制new_bi到old_bi*/
 	new_bi = head;
 	while (new_bi != NULL)
 	{
-		for (int i = 0; i < row; i++)
-		{
-			for (int j = 0; j < col; j++)
-			{
-				old_bi->self[i][j] = new_bi->self[i][j];
-				old_bi->flag = 1;
-			}
-		}
-		old_bi->next = new bi_hua;
-		old_bi = old_bi->next;
-		new_bi = new_bi->next;
+			*old_bi = *new_bi;
+			old_bi = create_next(old_bi);
+		    new_bi = new_bi->next;
 	}
-	
+	//print_bihua(old_head);
 	//将交点放入零散笔画中
 	bi_hua * input_bi = head;
 	while (input_bi != NULL)
@@ -671,27 +641,24 @@ bi_hua * do_main(Mat &srcimage) //传递的为单通道图像
     //print_bihua(head);
 
 	/*将零散笔画合并*/
-	bi_hua * second_bi; /*存储合并的笔画*/
-	bi_hua * head2;  /*存储合并笔画链表的表头*/
+
 	bi_hua * now_bi = head; /*融合交点后的笔画的指针*/
 	bi_hua * jisuan_old_bi = old_head; /*没有融合交点的指针*/
 	
-	second_bi = new bi_hua;
-	second_bi->head = second_bi;
 
-	head2 = second_bi;
 
-	cout << "合并开始:" << endl;
-	combine_bihua(now_bi, jisuan_old_bi, head2);
+
+	std::cout << "合并开始:" << endl;
+	combine_bihua(now_bi, jisuan_old_bi);
 	
 	/*print 测试*/
-	bi_hua * print_bi = head2;
-	//print_bihua(print_bi);
-	cout << "end" << endl;
+	bi_hua * print_bi = old_head;
+	print_bihua(print_bi);
+	std::cout << "end" << endl;
 	/*笔画还原*/
 	
 	
-	return head2;
+	return now_bi;
 }
 
 
