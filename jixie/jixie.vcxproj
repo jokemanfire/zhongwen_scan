@@ -133,12 +133,14 @@
   <ItemGroup>
     <ClCompile Include="bihua.cpp" />
     <ClCompile Include="check.cpp" />
+    <ClCompile Include="do_fitting.cpp" />
     <ClCompile Include="http_post.cpp" />
     <ClCompile Include="signed.cpp" />
     <ClCompile Include="the_main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bihua.h" />
+    <ClInclude Include="do_fitting.h" />
     <ClInclude Include="http_post.h" />
     <ClInclude Include="signed.h" />
     <ClInclude Include="the_main.h" />

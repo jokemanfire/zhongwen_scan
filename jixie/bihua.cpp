@@ -6,8 +6,9 @@
 #include<memory.h>
 #include<string.h>
 #include<vector>
+#include"do_fitting.h"
 #include "the_main.h"
-
+#include<float.h>
 
 
 using namespace std;
@@ -192,6 +193,19 @@ bool is_none(bi_hua * bi);
 void print_bihua2(bi_hua * head);
 /*笔画合并函数*/
 
+
+bool is_fittingTrue(int array1[][max_size], int array2[][max_size],int flag=1)
+{
+	double * array1_return;
+	double * array2_return;
+
+	array1_return =  do_fitting(array1);
+	array2_return = do_fitting(array2);
+	if (isnan(array1_return[1]) == 1&&isnan(array2_return[1]))
+		return true;
+	return false;
+	
+}
 void combine_bihua(bi_hua * yuan1,bi_hua * yuan2)
 {
 	bi_hua * now_bi = yuan1;
@@ -204,23 +218,15 @@ void combine_bihua(bi_hua * yuan1,bi_hua * yuan2)
 
 	while (now_bi != NULL&& now_bi1!=NULL)
 	{
-		cout << "now" << endl;
-		now_bi_slope = get_slope(now_bi1,1);
-		if (now_bi_slope == 500000)
-		{
-			now_bi1 = now_bi1->next;
-			now_bi = now_bi->next;
-			continue;
-		}
+
 		second_bi = yuan1;
 		second_bi1 = yuan2;
 		while (second_bi != NULL&&second_bi1 != NULL)
 		{
-			//print_bihua2(now_bi);
-			//print_bihua2(second_bi);
+			print_bihua2(now_bi);
+			print_bihua2(second_bi);
 
-			second_bi_slope = get_slope(second_bi1, 1);
-			if (second_bi_slope != 500000 &&fabs(now_bi_slope - second_bi_slope) == 0&& second_bi != now_bi)
+			if (is_fittingTrue(now_bi1->self,second_bi1->self)&& second_bi != now_bi)
 			{
 
 				if (is_in(now_bi, second_bi) == true)
@@ -256,27 +262,20 @@ void combine_bihua2(bi_hua * yuan1, bi_hua * yuan2) //竖直方向合并
 	bi_hua * second_bi = yuan1;
 	bi_hua * second_bi1 = yuan2;//yuan1有交点，yuan2无交点
 
-	float now_bi_slope = 0;
-	float second_bi_slope = 0;
+
 
 	while (now_bi != NULL && now_bi1 != NULL )
 	{
 
-		now_bi_slope = get_slope(now_bi1, 2);
-		if (now_bi_slope == 500000)
-		{
-			now_bi1 = now_bi1->next;
-			now_bi = now_bi->next;
-			continue;
-		}
+
 		second_bi = yuan1;
 		second_bi1 = yuan2;
 		while (second_bi != NULL && second_bi1 != NULL)
 		{
 			//print_bihua2(now_bi);
 			//print_bihua2(second_bi);
-			second_bi_slope = get_slope(second_bi1, 2);
-			if (second_bi_slope != 500000 && fabs(now_bi_slope - second_bi_slope) ==0&& second_bi != now_bi)
+		
+			if (is_fittingTrue(now_bi1->self,second_bi1->self)&& second_bi != now_bi)
 			{
 				if (is_in(now_bi, second_bi) == true)
 				{
@@ -729,12 +728,13 @@ bi_hua * do_main(Mat &srcimage) //传递的为单通道图像
 
 
 
-
-	std::cout << "合并开始:" << endl;
-	combine_bihua(now_bi, jisuan_old_bi);
+	do_fitting(head->self);
+	/*注释掉的*/
+	//std::cout << "合并开始:" << endl;
+	//combine_bihua(now_bi, jisuan_old_bi);
 	//bi_hua * print_bi = head;
 	//print_bihua(print_bi);
-	combine_bihua2(now_bi, jisuan_old_bi);
+	//combine_bihua2(now_bi, jisuan_old_bi);
 
 	
 	now_bi = head;
@@ -743,7 +743,7 @@ bi_hua * do_main(Mat &srcimage) //传递的为单通道图像
 	
 	/*print 测试*/
 
-	std::cout << "end" << endl;
+	//std::cout << "end" << endl;
 	return head;
 }
 

@@ -14,7 +14,7 @@
 
 
 
-#define src_input_path "D://Users//hubaba//workplace//jpg//de.bmp"
+#define src_input_path "D://Users//hubaba//workplace//bihua//pie.jpg"
 #define src_output_path "D://Users//hubaba//workplace//jpg//m.jpg"
 #define src_bit_path "D://Users//hubaba//workplace//jpg//bit.jpg"
 #define dst_bit_path "D://Users//hubaba//workplace//jpg//bit2.jpg"
@@ -457,7 +457,7 @@ void create_jpg(bi_hua * bi, Mat & srcimage,string path)
 			else
 				srcimage.at<uchar>(i, j) = 255;
 		}
-	imshow("ff", srcimage);
+//	imshow("ff", srcimage);
 	imwrite(path, srcimage);
 }
 
