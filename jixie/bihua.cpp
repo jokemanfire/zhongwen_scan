@@ -34,29 +34,32 @@ bi_hua & bi_hua::operator=(bi_hua & coper)
 	return * this;
 }
 
-bi_hua * bi_hua::delete_self()
+bi_hua * delete_self(bi_hua * head)
 {
 	bi_hua * temp;
-	if (this->next != NULL)
+	bi_hua * sd=head;
+	if (sd->next != NULL)
 	{
-		temp = this->next;
-		if (this->before != NULL)
+		temp = sd->next;
+		if (sd->before != NULL)
 		{
-			this->before->next = temp;
-			delete this;
+			sd->before->next = temp;
+			temp->before = sd->before;
+			delete head;
 			return temp;
 		}
 		else
 		{
-			delete this;
+			temp->before = NULL;
+			delete head;
 			return temp;
 		}
 	}
 	else
 	{
-		temp = this->before;
-		this->before->next = NULL;
-		delete this;
+		temp = sd->before;
+		temp->next = NULL;
+		delete head;
 		return temp;
 	}
 }
@@ -196,12 +199,12 @@ void combine_bihua(bi_hua * yuan1,bi_hua * yuan2)
 	bi_hua * second_bi = yuan1;
 	bi_hua * second_bi1 = yuan2;//yuan1有交点，yuan2无交点
 
-	float now_bi_slope=0;
-	float second_bi_slope=0;
+	float now_bi_slope = 0;
+	float second_bi_slope = 0;
 
-	while (now_bi != NULL)
+	while (now_bi != NULL&& now_bi1!=NULL)
 	{
-		
+		cout << "now" << endl;
 		now_bi_slope = get_slope(now_bi1,1);
 		if (now_bi_slope == 500000)
 		{
@@ -209,22 +212,28 @@ void combine_bihua(bi_hua * yuan1,bi_hua * yuan2)
 			now_bi = now_bi->next;
 			continue;
 		}
-		second_bi = yuan2;
-		second_bi1 = yuan1;
-		while (second_bi != NULL)
+		second_bi = yuan1;
+		second_bi1 = yuan2;
+		while (second_bi != NULL&&second_bi1 != NULL)
 		{
-			print_bihua2(second_bi);
+			//print_bihua2(now_bi);
+			//print_bihua2(second_bi);
 
 			second_bi_slope = get_slope(second_bi1, 1);
-			if (second_bi_slope != 500000 &&fabs(now_bi_slope - second_bi_slope) < 0.27&& second_bi != now_bi)
+			if (second_bi_slope != 500000 &&fabs(now_bi_slope - second_bi_slope) == 0&& second_bi != now_bi)
 			{
+
 				if (is_in(now_bi, second_bi) == true)
 				{
+					print_bihua2(now_bi1);
+					print_bihua2(second_bi1);
 					*now_bi = *second_bi;
-					second_bi = second_bi->delete_self();
-					second_bi1 = second_bi1->delete_self();
+					second_bi = delete_self(second_bi);
+					second_bi1 = delete_self(second_bi1);
 					now_bi->flag = 0;
 					combine_bihua(yuan1, yuan2);
+					second_bi = yuan1;
+					second_bi1 = yuan2;
 					continue;
 					
 				}
@@ -235,8 +244,61 @@ void combine_bihua(bi_hua * yuan1,bi_hua * yuan2)
 		now_bi1 = now_bi1->next;
 		now_bi = now_bi->next;
 	}
+
+
 	
 }
+
+void combine_bihua2(bi_hua * yuan1, bi_hua * yuan2) //竖直方向合并
+{
+	bi_hua * now_bi = yuan1;
+	bi_hua * now_bi1 = yuan2;
+	bi_hua * second_bi = yuan1;
+	bi_hua * second_bi1 = yuan2;//yuan1有交点，yuan2无交点
+
+	float now_bi_slope = 0;
+	float second_bi_slope = 0;
+
+	while (now_bi != NULL && now_bi1 != NULL )
+	{
+
+		now_bi_slope = get_slope(now_bi1, 2);
+		if (now_bi_slope == 500000)
+		{
+			now_bi1 = now_bi1->next;
+			now_bi = now_bi->next;
+			continue;
+		}
+		second_bi = yuan1;
+		second_bi1 = yuan2;
+		while (second_bi != NULL && second_bi1 != NULL)
+		{
+			//print_bihua2(now_bi);
+			//print_bihua2(second_bi);
+			second_bi_slope = get_slope(second_bi1, 2);
+			if (second_bi_slope != 500000 && fabs(now_bi_slope - second_bi_slope) ==0&& second_bi != now_bi)
+			{
+				if (is_in(now_bi, second_bi) == true)
+				{
+					*now_bi = *second_bi;
+					second_bi = delete_self(second_bi);
+					second_bi1 = delete_self(second_bi1);
+					now_bi->flag = 0;
+					combine_bihua2(yuan1, yuan2);
+					second_bi = yuan1;
+					second_bi1 = yuan2;
+					continue;
+
+				}
+			}
+			second_bi = second_bi->next;
+			second_bi1 = second_bi1->next;
+		}
+		now_bi1 = now_bi1->next;
+		now_bi = now_bi->next;
+	}
+}
+
 /*获得其中一个笔画*/
 bi_hua * get_one_hua(int ** arry,int x,int y,bi_hua * new_bi)
 {
@@ -335,11 +397,13 @@ float get_slope(bi_hua * bi,int flag)
 		if (flag == 1 && y2 - y1 != 0)
 		{
 			slope = (x2 - x1) / (y2 - y1);
+			cout << x1 << y1 << ' ' << x2 << y2 << endl;
 			return slope;
 		}
 		else if (flag == 2 && x2 - x1 != 0)
 		{
 			slope2 = (y2 - y1) / (x2 - x1);
+			cout << x1 << y1 << ' ' << x2 << y2 << endl;
 			return slope2;
 		}
 		else
@@ -368,11 +432,11 @@ void print_bihua(bi_hua * head)
 	bi_hua * print_bi = head;
 	while (print_bi != NULL)
 	{
-		if (is_none(print_bi) == false)
+		/*if (is_none(print_bi) == false)
 		{
 			print_bi = print_bi->next;
 			continue;
-		}
+		}*/
 		std::cout << "打印壁画" << endl;
 		for (int i = 0; i < max_size; i++)
 		{
@@ -398,8 +462,9 @@ void print_bihua(bi_hua * head)
 void print_bihua2(bi_hua * head)
 {
 	bi_hua * print_bi= head;
-	if (is_none(print_bi) == false)
+	/*if (is_none(print_bi) == false)
 		return ;
+		*/
 	std::cout << "该壁画开始" << endl;
 		for (int i = 0; i < max_size; i++)
 		{
@@ -558,6 +623,7 @@ bi_hua * do_main(Mat &srcimage) //传递的为单通道图像
 	
 	head = new_bi;
 	old_head = old_bi;
+
 	for (int i = 0; i < row; i++)
 	{
 		for (int j = 0; j < col; j++)
@@ -570,15 +636,30 @@ bi_hua * do_main(Mat &srcimage) //传递的为单通道图像
 			}
 		}
 	}
+	new_bi = head;
+	while (new_bi != NULL)
+	{
+
+		if (is_none(new_bi) == false)
+		{
+			//print_bihua2(new_bi);
+			new_bi = delete_self(new_bi);
+		}
+		else
+			new_bi = new_bi->next;
+	}
 	//print_bihua(head);
 	/*复制new_bi到old_bi*/
 	new_bi = head;
 	while (new_bi != NULL)
 	{
 			*old_bi = *new_bi;
+			//print_bihua2(old_bi);
+			//print_bihua2(new_bi);
 			old_bi = create_next(old_bi);
 		    new_bi = new_bi->next;
 	}
+//	cout << count << "--" << count1 << endl;
 	//print_bihua(old_head);
 	//将交点放入零散笔画中
 	bi_hua * input_bi = head;
@@ -648,17 +729,22 @@ bi_hua * do_main(Mat &srcimage) //传递的为单通道图像
 
 
 
+
 	std::cout << "合并开始:" << endl;
 	combine_bihua(now_bi, jisuan_old_bi);
+	//bi_hua * print_bi = head;
+	//print_bihua(print_bi);
+	combine_bihua2(now_bi, jisuan_old_bi);
+
+	
+	now_bi = head;
+
+
 	
 	/*print 测试*/
-	bi_hua * print_bi = old_head;
-	print_bihua(print_bi);
+
 	std::cout << "end" << endl;
-	/*笔画还原*/
-	
-	
-	return now_bi;
+	return head;
 }
 
 

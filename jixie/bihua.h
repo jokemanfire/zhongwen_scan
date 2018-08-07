@@ -14,7 +14,6 @@ public:
 	bi_hua * next = NULL;
 	bi_hua * before = NULL;
 	bi_hua & operator=(bi_hua & coper); //±Ê»­¸´ÖÆ²Ù×÷·ûÖØÔØ
-	bi_hua * delete_self();
 };
 bi_hua * do_main(Mat &srcimage);
 void get_before(bi_hua * head, int array2[max_size][max_size]);

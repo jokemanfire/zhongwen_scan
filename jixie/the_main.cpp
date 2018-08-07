@@ -546,7 +546,7 @@ void get_bihua(const char path[100]) //获得二值图像
 	int rd = 1;
 	char str[10000];
 	
-	while (my_bi->next != NULL)
+	while (my_bi != NULL)
 	{
 		Mat srcf(max_size,max_size, CV_8UC1);
 		string my_path;
