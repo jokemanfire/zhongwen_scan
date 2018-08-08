@@ -14,7 +14,7 @@
 
 
 
-#define src_input_path "D://Users//hubaba//workplace//bihua//pie.jpg"
+#define src_input_path "D://Users//hubaba//workplace//jpg//de.bmp"
 #define src_output_path "D://Users//hubaba//workplace//jpg//m.jpg"
 #define src_bit_path "D://Users//hubaba//workplace//jpg//bit.jpg"
 #define dst_bit_path "D://Users//hubaba//workplace//jpg//bit2.jpg"
@@ -530,7 +530,7 @@ void get_bihua(const char path[100]) //获得二值图像
 	bi_hua * my_bi; //获得笔画骨架
 	my_bi = do_main(src2);
 	bi_hua * head;
-	head = my_bi;
+	head = my_bi->next;
 
 	int array3[max_size][max_size];
 	for(int i=0;i<max_size;i++)

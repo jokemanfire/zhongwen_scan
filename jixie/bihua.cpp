@@ -199,62 +199,172 @@ bool is_fittingTrue(int array1[][max_size], int array2[][max_size],int flag=1)
 	double * array1_return;
 	double * array2_return;
 
+	double array1_re[5];
+	double array2_re[5];
+
+
 	array1_return =  do_fitting(array1);
+	for (int i = 0; i < 5; i++)
+		array1_re[i] = array1_return[i];
 	array2_return = do_fitting(array2);
-	if (isnan(array1_return[1]) == 1&&isnan(array2_return[1]))
+	for (int i = 0; i < 5; i++)
+		array2_re[i] = array2_return[i];
+
+	//cout << array1_re[1]<<' ' << array1_re[2] <<' '<< array1_re[3] << endl;
+	//cout << array2_re[1] <<' '<< array2_re[2] << ' '<<array2_re[3] << endl;
+	if (isnan(array1_re[1]) == 1 && isnan(array2_re[1]) == 1)
 		return true;
+	else if ((array1_re[3] > 0 && array2_re[3] < 0) || (array1_re[3] < 0 && array2_re[3]>0))
+	{
+		return false;
+	}
+	else
+	{
+		//将得到的两个函数中的点做差
+
+		//第一个函数
+		int counts = 0;
+		for (int i = 0; i<max_size; i++)
+			for (int j = 0; j<max_size; j++)
+			{
+				if (array1[i][j] == 1)
+					counts++;
+			}
+		int k = 0;
+		double *array1_1 = new double[counts];
+		double *array1_2 = new double[counts];
+		for (int i = 0; i < max_size; i++)
+		{
+			for (int j = 0; j < max_size; j++)
+			{
+				if (array1[i][j] == 1)
+				{
+					array1_1[k] = i;
+					array1_2[k] = j;
+					k++;
+				}
+				if (k >= counts)
+					break;
+			}
+			if (k >= counts)
+				break;
+		}
+
+		//第二个函数
+		counts = 0;
+		for (int i = 0; i<max_size; i++)
+			for (int j = 0; j<max_size; j++)
+			{
+				if (array2[i][j] == 1)
+					counts++;
+			}
+	    k = 0;
+		double *array2_1 = new double[counts];
+		double *array2_2 = new double[counts];
+		for (int i = 0; i < max_size; i++)
+		{
+			for (int j = 0; j < max_size; j++)
+			{
+				if (array2[i][j] == 1)
+				{
+					array2_1[k] = i;
+					array2_2[k] = j;
+					k++;
+				}
+				if (k >= counts)
+					break;
+			}
+			if (k >= counts)
+				break;
+		}
+		
+		double out_p=0;
+		double sume = 0;
+		for (int j = 0; j < counts; j ++)
+		{
+			out_p = array2_re[1] + array2_re[2] * array1_1[j] + array2_re[3] * array1_1[j] * array1_1[j];
+			//cout <<fabs( out_p- array2_2[j] )<< endl;
+			sume += fabs(out_p - array2_2[j]);
+		}
+		cout << "差为:" << sume / counts << endl;
+		if (sume/counts <= 8)
+			return true;
+		else
+			return false;
+	}
 	return false;
-	
 }
-void combine_bihua(bi_hua * yuan1,bi_hua * yuan2)
+void combine_bihua( bi_hua * const yuan1,bi_hua * const yuan2)
 {
 	bi_hua * now_bi = yuan1;
 	bi_hua * now_bi1 = yuan2;
 	bi_hua * second_bi = yuan1;
 	bi_hua * second_bi1 = yuan2;//yuan1有交点，yuan2无交点
 
-	float now_bi_slope = 0;
-	float second_bi_slope = 0;
-
-	while (now_bi != NULL&& now_bi1!=NULL)
+	if (now_bi->head == 1)
 	{
+		now_bi = now_bi->next;
+	}
+	if (now_bi1->head == 1)
+	{
+		now_bi1 = now_bi1->next;
+	}
+
+	while ( now_bi!= NULL&& now_bi1!=NULL)
+	{
+		int cover = 0;
+		//给now_bi所指的上锁
+		if (now_bi->flag == 1)
+		{
+			now_bi->flag = 0;
+			now_bi1->flag = 0;
+			cover = 1;
+		}
 
 		second_bi = yuan1;
 		second_bi1 = yuan2;
+
 		while (second_bi != NULL&&second_bi1 != NULL)
 		{
-			print_bihua2(now_bi);
-			print_bihua2(second_bi);
-
-			if (is_fittingTrue(now_bi1->self,second_bi1->self)&& second_bi != now_bi)
+			if (second_bi->head != 1 && second_bi1->head!=1)
 			{
-
-				if (is_in(now_bi, second_bi) == true)
+				if (second_bi != now_bi  && is_fittingTrue(now_bi1->self, second_bi1->self))
 				{
-					print_bihua2(now_bi1);
-					print_bihua2(second_bi1);
-					*now_bi = *second_bi;
-					second_bi = delete_self(second_bi);
-					second_bi1 = delete_self(second_bi1);
-					now_bi->flag = 0;
-					combine_bihua(yuan1, yuan2);
-					second_bi = yuan1;
-					second_bi1 = yuan2;
-					continue;
-					
+
+					if (is_in(now_bi, second_bi) == true && second_bi->flag == 1 && second_bi1->flag == 1)
+					{
+
+						*now_bi = *second_bi;
+						second_bi = delete_self(second_bi);
+						second_bi1 = delete_self(second_bi1);
+						second_bi->flag = 0; //加锁
+						second_bi1->flag = 0;
+
+						combine_bihua(yuan1, yuan2);
+
+						second_bi->flag = 1; //解锁
+						second_bi1->flag = 1;
+
+					}
 				}
 			}
-			second_bi = second_bi->next;
-			second_bi1 = second_bi1->next;
+		second_bi = second_bi->next;
+		second_bi1 = second_bi1->next;	
 		}
+
+		//给now_bi所指解锁
+		if (cover == 1)
+		{
+			now_bi->flag = 1;
+			now_bi1->flag = 1;
+		}
+		
 		now_bi1 = now_bi1->next;
 		now_bi = now_bi->next;
 	}
-
-
-	
 }
 
+/*
 void combine_bihua2(bi_hua * yuan1, bi_hua * yuan2) //竖直方向合并
 {
 	bi_hua * now_bi = yuan1;
@@ -275,7 +385,7 @@ void combine_bihua2(bi_hua * yuan1, bi_hua * yuan2) //竖直方向合并
 			//print_bihua2(now_bi);
 			//print_bihua2(second_bi);
 		
-			if (is_fittingTrue(now_bi1->self,second_bi1->self)&& second_bi != now_bi)
+			if (second_bi != now_bi&&is_fittingTrue(now_bi1->self,second_bi1->self))
 			{
 				if (is_in(now_bi, second_bi) == true)
 				{
@@ -297,7 +407,7 @@ void combine_bihua2(bi_hua * yuan1, bi_hua * yuan2) //竖直方向合并
 		now_bi = now_bi->next;
 	}
 }
-
+*/
 /*获得其中一个笔画*/
 bi_hua * get_one_hua(int ** arry,int x,int y,bi_hua * new_bi)
 {
@@ -617,8 +727,22 @@ bi_hua * do_main(Mat &srcimage) //传递的为单通道图像
 	bi_hua * new_bi;
 	bi_hua * old_bi, * old_head;
 	bi_hua * head;
+	bi_hua * really_head;
+
+	//链表头
 	new_bi = new bi_hua;
+	new_bi->head = 1;
+	really_head = new_bi;
+	new_bi->next = new bi_hua;
+	new_bi->next->before = new_bi;
+	new_bi = new_bi->next;
+
+
 	old_bi = new bi_hua;
+	old_bi->head = 1;
+	old_bi->next = new bi_hua;
+	old_bi->next->before = old_bi;
+	old_bi = old_bi->next;
 	
 	head = new_bi;
 	old_head = old_bi;
@@ -718,7 +842,7 @@ bi_hua * do_main(Mat &srcimage) //传递的为单通道图像
 			}
 		input_bi = input_bi->next;
 	}
-    //print_bihua(head);
+ //   print_bihua(old_head);
 
 	/*将零散笔画合并*/
 
@@ -728,23 +852,18 @@ bi_hua * do_main(Mat &srcimage) //传递的为单通道图像
 
 
 
-	do_fitting(head->self);
-	/*注释掉的*/
-	//std::cout << "合并开始:" << endl;
-	//combine_bihua(now_bi, jisuan_old_bi);
+
+
+	std::cout << "合并开始:" << endl;
+	combine_bihua(now_bi->before, jisuan_old_bi->before);
 	//bi_hua * print_bi = head;
 	//print_bihua(print_bi);
 	//combine_bihua2(now_bi, jisuan_old_bi);
 
-	
-	now_bi = head;
-
-
-	
 	/*print 测试*/
 
 	//std::cout << "end" << endl;
-	return head;
+	return really_head;
 }
 
 

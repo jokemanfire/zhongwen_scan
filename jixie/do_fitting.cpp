@@ -20,8 +20,6 @@ double Em[6][4];
 //主函数，这里将数据拟合成二次曲线
 double * do_fitting(int arry1[max_size][max_size])
 {
-	ofstream ofile;
-	ofile.open("D://Users//hubaba//workplace//bi//pie.txt", ios::app);
 	int counts = 0;
 	for (int i = 0; i<max_size; i++)
 		for (int j = 0; j<max_size; j++)
@@ -29,7 +27,7 @@ double * do_fitting(int arry1[max_size][max_size])
 			if (arry1[i][j] == 1)
 				counts++;
 		}
-	cout << counts << endl;
+	//cout << counts << endl;
 	double *array1 = new double[counts];
 	double *array2 = new double[counts];
 
@@ -50,7 +48,7 @@ double * do_fitting(int arry1[max_size][max_size])
 		if (k >= counts)
 			break;
 	}
-	double coefficient[5];
+	static double coefficient[5];
 	memset(coefficient, 0, sizeof(double) * 5);
 	vector<double> vx, vy;
 	for (int i = 0; i<counts; i++)
@@ -64,7 +62,6 @@ double * do_fitting(int arry1[max_size][max_size])
 	//if( isnan(coefficient[i]) == 1 )
 	// }
 	printf("拟合方程为：y = %lf + %lfx + %lfx^2 \n", coefficient[1], coefficient[2], coefficient[3]);
-	ofile << coefficient[1]<<' '<< coefficient[2]<<' '<< coefficient[3] << endl;
 	return coefficient;
 }
 
