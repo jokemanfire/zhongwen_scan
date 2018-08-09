@@ -25,7 +25,10 @@ double * do_fitting(int arry1[max_size][max_size])
 		for (int j = 0; j<max_size; j++)
 		{
 			if (arry1[i][j] == 1)
+			{
 				counts++;
+				break;
+			}
 		}
 	//cout << counts << endl;
 	double *array1 = new double[counts];
@@ -41,6 +44,7 @@ double * do_fitting(int arry1[max_size][max_size])
 				array1[k] = i;
 				array2[k] = j;
 				k++;
+				break;
 			}
 			if (k >= counts)
 				break;

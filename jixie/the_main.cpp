@@ -14,7 +14,7 @@
 
 
 
-#define src_input_path "D://Users//hubaba//workplace//jpg//de.bmp"
+#define src_input_path "D://Users//hubaba//workplace//jpg//3.jpg"
 #define src_output_path "D://Users//hubaba//workplace//jpg//m.jpg"
 #define src_bit_path "D://Users//hubaba//workplace//jpg//bit.jpg"
 #define dst_bit_path "D://Users//hubaba//workplace//jpg//bit2.jpg"

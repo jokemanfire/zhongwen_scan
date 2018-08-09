@@ -210,11 +210,9 @@ bool is_fittingTrue(int array1[][max_size], int array2[][max_size],int flag=1)
 	for (int i = 0; i < 5; i++)
 		array2_re[i] = array2_return[i];
 
-	//cout << array1_re[1]<<' ' << array1_re[2] <<' '<< array1_re[3] << endl;
-	//cout << array2_re[1] <<' '<< array2_re[2] << ' '<<array2_re[3] << endl;
-	if (isnan(array1_re[1]) == 1 && isnan(array2_re[1]) == 1)
-		return true;
-	else if ((array1_re[3] > 0 && array2_re[3] < 0) || (array1_re[3] < 0 && array2_re[3]>0))
+	//std::cout << array1_re[1]<<' ' << array1_re[2] <<' '<< array1_re[3] << endl;
+	//std::cout << array2_re[1] <<' '<< array2_re[2] << ' '<<array2_re[3] << endl;
+    if ((array1_re[3] > 0 && array2_re[3] < 0) || (array1_re[3] < 0 && array2_re[3]>0))
 	{
 		return false;
 	}
@@ -223,16 +221,20 @@ bool is_fittingTrue(int array1[][max_size], int array2[][max_size],int flag=1)
 		//将得到的两个函数中的点做差
 
 		//第一个函数
-		int counts = 0;
+		int counts1 = 0;
 		for (int i = 0; i<max_size; i++)
 			for (int j = 0; j<max_size; j++)
 			{
 				if (array1[i][j] == 1)
-					counts++;
+				{
+					counts1++;
+					break;
+				}
 			}
+		//std::cout << counts << endl;
 		int k = 0;
-		double *array1_1 = new double[counts];
-		double *array1_2 = new double[counts];
+		double *array1_1 = new double[counts1];
+		double *array1_2 = new double[counts1];
 		for (int i = 0; i < max_size; i++)
 		{
 			for (int j = 0; j < max_size; j++)
@@ -242,25 +244,29 @@ bool is_fittingTrue(int array1[][max_size], int array2[][max_size],int flag=1)
 					array1_1[k] = i;
 					array1_2[k] = j;
 					k++;
+					break;
 				}
-				if (k >= counts)
+				if (k >= counts1)
 					break;
 			}
-			if (k >= counts)
+			if (k >= counts1)
 				break;
 		}
 
 		//第二个函数
-		counts = 0;
+		int counts2 = 0;
 		for (int i = 0; i<max_size; i++)
 			for (int j = 0; j<max_size; j++)
 			{
 				if (array2[i][j] == 1)
-					counts++;
+				{
+					counts2++;
+					break;
+				}
 			}
 	    k = 0;
-		double *array2_1 = new double[counts];
-		double *array2_2 = new double[counts];
+		double *array2_1 = new double[counts2];
+		double *array2_2 = new double[counts2];
 		for (int i = 0; i < max_size; i++)
 		{
 			for (int j = 0; j < max_size; j++)
@@ -270,31 +276,139 @@ bool is_fittingTrue(int array1[][max_size], int array2[][max_size],int flag=1)
 					array2_1[k] = i;
 					array2_2[k] = j;
 					k++;
+					break;
 				}
-				if (k >= counts)
+				if (k >= counts2)
 					break;
 			}
-			if (k >= counts)
+			if (k >= counts2)
 				break;
 		}
 		
-		double out_p=0;
-		double sume = 0;
-		for (int j = 0; j < counts; j ++)
+		double out_p = 0, out_p1 = 0 , out_p2 = 0;
+		double sume = 0,sume1=0,sume2=0;
+		for (int j = 0; j < counts1; j ++)
+		{
+			out_p1 = array1_re[1] + array1_re[2] * array1_1[j] + array1_re[3] * array1_1[j] * array1_1[j];
+			std::cout << out_p1 << endl;
+			sume1 += fabs(out_p1 - array1_2[j]);
+			
+		}
+
+		for (int j = 0; j < counts2; j++)
+		{
+			out_p2 = array2_re[1] + array2_re[2] * array2_1[j] + array2_re[3] * array2_1[j] * array2_1[j];
+			//std::cout << out_p1 << endl;
+			sume2 += fabs(out_p2 - array2_2[j]);
+		}
+
+		for (int j = 0; j < min(counts2,counts1); j++)
 		{
 			out_p = array2_re[1] + array2_re[2] * array1_1[j] + array2_re[3] * array1_1[j] * array1_1[j];
-			//cout <<fabs( out_p- array2_2[j] )<< endl;
 			sume += fabs(out_p - array2_2[j]);
 		}
-		cout << "差为:" << sume / counts << endl;
-		if (sume/counts <= 8)
+		std::cout << "一方程与原方程差:" << fabs(sume1) / counts1 << endl;
+		std::cout << "二方程与原方程的差:" << fabs(sume2) / counts2 << endl;
+		std::cout << "与另一方程差:" << fabs(sume) / min(counts2,counts1) << endl;
+		std::cout << "总差为:" << fabs(fabs(sume1) / counts1 - fabs(sume) / min(counts2, counts1)) << endl;
+		if (fabs(sume1) / counts1 > 1||fabs(sume2)/counts2>1)
+			return false;
+		if (fabs(fabs(sume1) / counts1 - fabs(sume) / min(counts2, counts1))<10)
 			return true;
 		else
 			return false;
 	}
 	return false;
 }
-void combine_bihua( bi_hua * const yuan1,bi_hua * const yuan2)
+
+bool is_fittingTrue2(bi_hua * bi1,bi_hua * bi2)
+{
+	float slope1=0;
+	float slope2=0;
+	slope1 = get_slope(bi1, 1);
+	slope2 = get_slope(bi2, 1);
+	if (slope1!= 500000 &&slope2!= 500000 &&fabs(slope1 - slope2 )< 0.5)
+		return true;
+	else
+		return false;
+}
+
+void combine_bihua2(bi_hua * const yuan1, bi_hua * const yuan2)//对水平方向合并
+{
+	bi_hua * now_bi = yuan1;
+	bi_hua * now_bi1 = yuan2;
+	bi_hua * second_bi = yuan1;
+	bi_hua * second_bi1 = yuan2;//yuan1有交点，yuan2无交点
+
+	if (now_bi->head == 1)
+	{
+		now_bi = now_bi->next;
+	}
+	if (now_bi1->head == 1)
+	{
+		now_bi1 = now_bi1->next;
+	}
+
+	while (now_bi != NULL && now_bi1 != NULL)
+	{
+		int cover = 0;
+		//给now_bi所指的上锁
+		if (now_bi->flag == 1)
+		{
+			now_bi->flag = 0;
+			now_bi1->flag = 0;
+			cover = 1;
+		}
+
+		second_bi = yuan1;
+		second_bi1 = yuan2;
+
+		while (second_bi != NULL && second_bi1 != NULL)
+		{
+			if (second_bi->head != 1 && second_bi1->head != 1)
+			{
+				print_bihua2(now_bi);
+				print_bihua2(second_bi);
+				if (second_bi != now_bi && is_fittingTrue2(now_bi1, second_bi1))
+				{
+
+					if (is_in(now_bi, second_bi) == true && second_bi->flag == 1 && second_bi1->flag == 1)
+					{
+						if (second_bi->status == 1 && now_bi->status == 1)
+						{
+							*now_bi = *second_bi;
+							*now_bi1 = *second_bi1;
+							second_bi = delete_self(second_bi);
+							second_bi1 = delete_self(second_bi1);
+							second_bi->flag = 0; //加锁
+							second_bi1->flag = 0;
+
+							combine_bihua2(yuan1, yuan2);
+
+							second_bi->flag = 1; //解锁
+							second_bi1->flag = 1;
+						}
+
+					}
+				}
+			}
+			second_bi = second_bi->next;
+			second_bi1 = second_bi1->next;
+		}
+
+		//给now_bi所指解锁
+		if (cover == 1)
+		{
+			now_bi->flag = 1;
+			now_bi1->flag = 1;
+		}
+
+		now_bi1 = now_bi1->next;
+		now_bi = now_bi->next;
+	}
+}
+
+void combine_bihua( bi_hua * const yuan1,bi_hua * const yuan2,int a_flag=1)  //对竖直方向合并
 {
 	bi_hua * now_bi = yuan1;
 	bi_hua * now_bi1 = yuan2;
@@ -328,6 +442,8 @@ void combine_bihua( bi_hua * const yuan1,bi_hua * const yuan2)
 		{
 			if (second_bi->head != 1 && second_bi1->head!=1)
 			{
+				print_bihua2(now_bi);
+				print_bihua2(second_bi);
 				if (second_bi != now_bi  && is_fittingTrue(now_bi1->self, second_bi1->self))
 				{
 
@@ -335,6 +451,9 @@ void combine_bihua( bi_hua * const yuan1,bi_hua * const yuan2)
 					{
 
 						*now_bi = *second_bi;
+						*now_bi1 = *second_bi1;
+						now_bi->status = 0;
+						now_bi1->status = 0;
 						second_bi = delete_self(second_bi);
 						second_bi1 = delete_self(second_bi1);
 						second_bi->flag = 0; //加锁
@@ -364,50 +483,7 @@ void combine_bihua( bi_hua * const yuan1,bi_hua * const yuan2)
 	}
 }
 
-/*
-void combine_bihua2(bi_hua * yuan1, bi_hua * yuan2) //竖直方向合并
-{
-	bi_hua * now_bi = yuan1;
-	bi_hua * now_bi1 = yuan2;
-	bi_hua * second_bi = yuan1;
-	bi_hua * second_bi1 = yuan2;//yuan1有交点，yuan2无交点
 
-
-
-	while (now_bi != NULL && now_bi1 != NULL )
-	{
-
-
-		second_bi = yuan1;
-		second_bi1 = yuan2;
-		while (second_bi != NULL && second_bi1 != NULL)
-		{
-			//print_bihua2(now_bi);
-			//print_bihua2(second_bi);
-		
-			if (second_bi != now_bi&&is_fittingTrue(now_bi1->self,second_bi1->self))
-			{
-				if (is_in(now_bi, second_bi) == true)
-				{
-					*now_bi = *second_bi;
-					second_bi = delete_self(second_bi);
-					second_bi1 = delete_self(second_bi1);
-					now_bi->flag = 0;
-					combine_bihua2(yuan1, yuan2);
-					second_bi = yuan1;
-					second_bi1 = yuan2;
-					continue;
-
-				}
-			}
-			second_bi = second_bi->next;
-			second_bi1 = second_bi1->next;
-		}
-		now_bi1 = now_bi1->next;
-		now_bi = now_bi->next;
-	}
-}
-*/
 /*获得其中一个笔画*/
 bi_hua * get_one_hua(int ** arry,int x,int y,bi_hua * new_bi)
 {
@@ -506,13 +582,13 @@ float get_slope(bi_hua * bi,int flag)
 		if (flag == 1 && y2 - y1 != 0)
 		{
 			slope = (x2 - x1) / (y2 - y1);
-			cout << x1 << y1 << ' ' << x2 << y2 << endl;
+			//std::cout << x1 << y1 << ' ' << x2 << y2 << endl;
 			return slope;
 		}
 		else if (flag == 2 && x2 - x1 != 0)
 		{
 			slope2 = (y2 - y1) / (x2 - x1);
-			cout << x1 << y1 << ' ' << x2 << y2 << endl;
+			//std::cout << x1 << y1 << ' ' << x2 << y2 << endl;
 			return slope2;
 		}
 		else
@@ -727,7 +803,7 @@ bi_hua * do_main(Mat &srcimage) //传递的为单通道图像
 	bi_hua * new_bi;
 	bi_hua * old_bi, * old_head;
 	bi_hua * head;
-	bi_hua * really_head;
+	bi_hua * really_head,*really_old;
 
 	//链表头
 	new_bi = new bi_hua;
@@ -740,6 +816,7 @@ bi_hua * do_main(Mat &srcimage) //传递的为单通道图像
 
 	old_bi = new bi_hua;
 	old_bi->head = 1;
+	really_old = old_bi;
 	old_bi->next = new bi_hua;
 	old_bi->next->before = old_bi;
 	old_bi = old_bi->next;
@@ -856,9 +933,7 @@ bi_hua * do_main(Mat &srcimage) //传递的为单通道图像
 
 	std::cout << "合并开始:" << endl;
 	combine_bihua(now_bi->before, jisuan_old_bi->before);
-	//bi_hua * print_bi = head;
-	//print_bihua(print_bi);
-	//combine_bihua2(now_bi, jisuan_old_bi);
+	combine_bihua2(now_bi, jisuan_old_bi);
 
 	/*print 测试*/
 

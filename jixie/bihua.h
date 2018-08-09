@@ -10,6 +10,7 @@ class bi_hua
 public:
 	int flag = 1; //用来实现锁操作
 	int head = 0; //判断是否为头
+	int status = 1; //判断状态
 	int self[max_size][max_size] = { 0 };
 	bi_hua * next = NULL;
 	bi_hua * before = NULL;
