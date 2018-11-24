@@ -66,6 +66,7 @@ std::string base64_encode(const std::string& src) {
 
 
  std::string do_signed() {
+
 	std::string appid = "1253112332";
 	std::string secret_id = "AKIDf9ON6Zvpb6LK2bEwxjETTDhurYy8Me06";
 	std::string secret_key = "3sSmpb8PPBhwwhBPN5XkiRyGI6fz4vXu";
@@ -96,5 +97,6 @@ std::string base64_encode(const std::string& src) {
 	std::string sign = base64_encode(data);
 
 	//printf("%s\n", sign.c_str());
+
 	return sign.c_str();
 }

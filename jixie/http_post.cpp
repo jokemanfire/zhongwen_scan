@@ -7,10 +7,14 @@
 #include <string>
 #include <sstream>
 #include <stdlib.h>
+#include<opencv2/opencv.hpp>
+#include"ZBase64.h"
+#include<vector>
 #ifdef WIN32
 #pragma comment(lib,"ws2_32.lib")
 #endif
 
+using namespace cv;
 using namespace std;
 //转码utf-8 to gbk
 char* U2G(const char* utf8)
@@ -77,7 +81,7 @@ void HttpConnect::socketHttp(std::string host, std::string request)
 		std::cout << "connection error!" << std::endl;
 		return;
 	}
-	std::cout << request << std::endl;
+	std::cout <<request.c_str() << std::endl;
 #ifdef WIN32
 	send(sockfd, request.c_str(), request.size(), 0);
 #else
@@ -132,10 +136,18 @@ void HttpConnect::postData_img(std::string host, std::string path, std::string p
 	std::stringstream stream;
 	stream << "POST " << path;
 	stream << " HTTP/1.1\r\n";
-	stream << "Authorization:" << auth << "\r\n";
-	stream << "Content-Type:multipart/form-data;boundary=71ebdf13572468\r\n";
-	stream << "Host: " << "recognition.image.myqcloud.com " << "\r\n\r\n";
+	stream << "Accept-Encoding: gzip,deflate";
 	
+	stream << "Host: " << "recognition.image.myqcloud.com " << "\r\n";
+	//stream << "Content-Type:multipart/form-data;boundary=71ebdf13572468\r\n";
+	
+	stream.seekg(0, std::ios_base::end);
+	size_t size = stream.tellg();
+	stream << "Content-Lenth:"<<size<<"\r\n";
+	stream << "Authorization:" << auth << "\r\n";
+	//stream << "Connection:keep-alive\r\n\r\n";
+	stream << "content-type:multipart/form-data; boundary=----71ebdf13572468\r\n\r\n";
+
 	stream << "--71ebdf13572468\r\n\
 Content-Disposition:form-data;name=\"appid\";\r\n\r\n\
 1253112332\r\n\
@@ -148,6 +160,7 @@ Content-Type:image/jpeg\r\n\
 ";
 	stream << post_content.c_str();
 	stream << "--71ebdf13572468--";
+	stream.seekg(0, std::ios_base::beg);
 	socketHttp(host, stream.str());
 }
 
@@ -170,36 +183,26 @@ string  http_post()
 	std::string sta;
 	std::string s;
 	std::string m;
-	char ms[1024] = { '1' };
 	
-	char filename[] = "D:\\Users\\hubaba\\workplace\\jpg\\m.jpg";
-	int length2;
-	int length;
-	FILE* fp;
+	Mat img = imread("D:\\Users\\hubaba\\workplace\\jpg\\3.jpg");
 
-	//以二进制方式打开图像
-	if ((fp = fopen(filename, "rb")) == NULL)
-	{
-		cout << "Open image failed!" << endl;
-		exit(0);
-	}
-	//获取图像数据总长度
-	fseek(fp, 0, SEEK_END);
-	length = ftell(fp);
-	rewind(fp);
-	//根据图像数据长度分配内存buffer
-	char* ImgBuffer = (char*)malloc(length * sizeof(char));
-	//将图像数据读入buffer
-	fread(ImgBuffer, length, 1, fp);
-	//for (int i = 0; i<length; i++)
-		//printf("%c", ImgBuffer[i]);
-	m = ImgBuffer;
+	vector<uchar> vecImg;                               //Mat 图片数据转换为vector<uchar>
+	vector<int> vecCompression_params;
+	vecCompression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
+	vecCompression_params.push_back(90);
+	imencode(".jpg", img, vecImg, vecCompression_params);
+
+	ZBase64 base64;
+	string imgbase64 = base64.Encode(vecImg.data(), vecImg.size());     //实现图片的base64编码
+
+	//cout << imgbase64 << endl;
+
 	sta = do_signed();
 	HttpConnect http;
 	//post的url请求方式
-	http.postData("116.31.68.142", "/ocr/handwriting","{\r\n \"appid\":\"1253112332\", \r\n \"url\":\"http://nun-1253112332.picsh.myqcloud.com/u=827695224,2790795436&fm=27&gp=0.jpg\"\r\n} ", sta);
-	//http.getData("116.31.68.142","/ocr/handwriting", "");
-	//http.postData_img("116.31.68.142", "/ocr/handwriting", ImgBuffer, sta);
+	//http.postData("116.31.68.142", "/ocr/handwriting","{\r\n \"appid\":\"1253112332\", \r\n \"url\":\"http://nun-1253112332.picsh.myqcloud.com/u=827695224,2790795436&fm=27&gp=0.jpg\"\r\n} ", sta);
+
+	http.postData_img("116.31.68.142", "/ocr/handwriting", imgbase64, sta);
 	getchar();
 	return my_key;
 }

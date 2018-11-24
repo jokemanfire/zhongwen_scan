@@ -15,22 +15,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="signed.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="http_post.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="bihua.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="check.cpp">
+    <ClCompile Include="do_fitting.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="the_main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="do_fitting.cpp">
+    <ClCompile Include="feature.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,13 +35,10 @@
     <ClInclude Include="the_main.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="signed.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="http_post.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="do_fitting.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="feature.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

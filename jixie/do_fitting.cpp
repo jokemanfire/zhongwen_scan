@@ -44,6 +44,7 @@ double * do_fitting(int arry1[max_size][max_size])
 				array1[k] = i;
 				array2[k] = j;
 				k++;
+				cout << i << j << "  ";
 				break;
 			}
 			if (k >= counts)
@@ -57,6 +58,7 @@ double * do_fitting(int arry1[max_size][max_size])
 	vector<double> vx, vy;
 	for (int i = 0; i<counts; i++)
 	{
+
 		vx.push_back(array1[i]);
 		vy.push_back(array2[i]);
 	}

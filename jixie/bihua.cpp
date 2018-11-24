@@ -285,12 +285,12 @@ bool is_fittingTrue(int array1[][max_size], int array2[][max_size],int flag=1)
 				break;
 		}
 		
-		double out_p = 0, out_p1 = 0 , out_p2 = 0;
-		double sume = 0,sume1=0,sume2=0;
+		double out_p = 0, out_p1 = 0 , out_p2 = 0,out_p3 = 0;
+		double sume = 0,sume1=0,sume2=0,sume3= 0;
 		for (int j = 0; j < counts1; j ++)
 		{
 			out_p1 = array1_re[1] + array1_re[2] * array1_1[j] + array1_re[3] * array1_1[j] * array1_1[j];
-			std::cout << out_p1 << endl;
+			//std::cout << out_p1 << endl;
 			sume1 += fabs(out_p1 - array1_2[j]);
 			
 		}
@@ -307,13 +307,21 @@ bool is_fittingTrue(int array1[][max_size], int array2[][max_size],int flag=1)
 			out_p = array2_re[1] + array2_re[2] * array1_1[j] + array2_re[3] * array1_1[j] * array1_1[j];
 			sume += fabs(out_p - array2_2[j]);
 		}
+
+		for (int j = 0; j < min(counts2, counts1); j++)
+		{
+			out_p3 = array1_re[1] + array1_re[2] * array2_1[j] + array1_re[3] * array2_1[j] * array2_1[j];
+			sume3 += fabs(out_p3 - array1_2[j]);
+		}
+
 		std::cout << "Ò»·½³ÌÓëÔ­·½³Ì²î:" << fabs(sume1) / counts1 << endl;
 		std::cout << "¶ş·½³ÌÓëÔ­·½³ÌµÄ²î:" << fabs(sume2) / counts2 << endl;
-		std::cout << "ÓëÁíÒ»·½³Ì²î:" << fabs(sume) / min(counts2,counts1) << endl;
-		std::cout << "×Ü²îÎª:" << fabs(fabs(sume1) / counts1 - fabs(sume) / min(counts2, counts1)) << endl;
+		std::cout << "Ò»·½³ÌÓë¶ş·½³Ì²î:" << fabs(sume) / min(counts2,counts1) << endl;
+		std::cout << "¶ş·½³ÌÓëÒ»·½³Ì²î:" << fabs(sume3) / min(counts2, counts1) << endl;
+		std::cout << "×Ü²îÎª:" << max(fabs(fabs(sume1) / counts1 - fabs(sume) / min(counts2, counts1)), fabs(fabs(sume2) / counts1 - fabs(sume3) / min(counts2, counts1))) << endl;
 		if (fabs(sume1) / counts1 > 1||fabs(sume2)/counts2>1)
 			return false;
-		if (fabs(fabs(sume1) / counts1 - fabs(sume) / min(counts2, counts1))<10)
+		if (max(fabs(fabs(sume1) / counts1 - fabs(sume) / min(counts2, counts1)), fabs(fabs(sume2) / counts1 - fabs(sume3) / min(counts2, counts1))) <11) //ÉèÖÃÎó²îãĞÖµ
 			return true;
 		else
 			return false;
@@ -367,8 +375,8 @@ void combine_bihua2(bi_hua * const yuan1, bi_hua * const yuan2)//¶ÔË®Æ½·½ÏòºÏ²¢
 		{
 			if (second_bi->head != 1 && second_bi1->head != 1)
 			{
-				print_bihua2(now_bi);
-				print_bihua2(second_bi);
+				//print_bihua2(now_bi);
+				//print_bihua2(second_bi);
 				if (second_bi != now_bi && is_fittingTrue2(now_bi1, second_bi1))
 				{
 
@@ -442,8 +450,8 @@ void combine_bihua( bi_hua * const yuan1,bi_hua * const yuan2,int a_flag=1)  //¶
 		{
 			if (second_bi->head != 1 && second_bi1->head!=1)
 			{
-				print_bihua2(now_bi);
-				print_bihua2(second_bi);
+				//print_bihua2(now_bi);
+				//print_bihua2(second_bi);
 				if (second_bi != now_bi  && is_fittingTrue(now_bi1->self, second_bi1->self))
 				{
 
@@ -695,7 +703,7 @@ int count_point2(one_room new_room)
 }
 
 
-//½»µã´¦Àí
+//Ö÷´¦Àíº¯Êı
 bi_hua * do_main(Mat &srcimage) //´«µİµÄÎªµ¥Í¨µÀÍ¼Ïñ
 {
 	int col, row;
@@ -933,7 +941,7 @@ bi_hua * do_main(Mat &srcimage) //´«µİµÄÎªµ¥Í¨µÀÍ¼Ïñ
 
 	std::cout << "ºÏ²¢¿ªÊ¼:" << endl;
 	combine_bihua(now_bi->before, jisuan_old_bi->before);
-	combine_bihua2(now_bi, jisuan_old_bi);
+	combine_bihua2(now_bi->before, jisuan_old_bi->before);
 
 	/*print ²âÊÔ*/
 

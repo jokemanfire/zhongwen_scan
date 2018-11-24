@@ -1,27 +1,9 @@
 
 
-#include <opencv2/opencv.hpp>
-#include<math.h>
-#include <iostream>
-#include <fstream>
-#include <vector>
+
+#include <regex>
 #include "the_main.h"
-#include "bihua.h"
-#include <random>
 
-
-
-
-
-
-#define src_input_path "D://Users//hubaba//workplace//jpg//3.jpg"
-#define src_output_path "D://Users//hubaba//workplace//jpg//m.jpg"
-#define src_bit_path "D://Users//hubaba//workplace//jpg//bit.jpg"
-#define dst_bit_path "D://Users//hubaba//workplace//jpg//bit2.jpg"
-
-
-
-String bi_hua_path = "D://Users//hubaba//workplace//bi//";  //保存笔画的路径
 
 /*img_print class*/
 
@@ -308,142 +290,7 @@ void zhang_thinimage_improve(Mat &srcimage)//单通道、二值化后的图像
 	}
 }
 
-//细化算法1
-void chao_thinimage(Mat &srcimage)//单通道、二值化后的图像
-{
-	vector<Point> deletelist1;
-	int Zhangmude[9];
-	int nl = srcimage.rows;
-	int nc = srcimage.cols;
-	while (true)
-	{
-		for (int j = 1; j < (nl - 1); j++)
-		{
-			uchar* data_last = srcimage.ptr<uchar>(j - 1);
-			uchar* data = srcimage.ptr<uchar>(j);
-			uchar* data_next = srcimage.ptr<uchar>(j + 1);
-			for (int i = 1; i < (nc - 1); i++)
-			{
-				if (data[i] == 255)
-				{
-					Zhangmude[0] = 1;
-					if (data_last[i] == 255) Zhangmude[1] = 1;
-					else  Zhangmude[1] = 0;
-					if (data_last[i + 1] == 255) Zhangmude[2] = 1;
-					else  Zhangmude[2] = 0;
-					if (data[i + 1] == 255) Zhangmude[3] = 1;
-					else  Zhangmude[3] = 0;
-					if (data_next[i + 1] == 255) Zhangmude[4] = 1;
-					else  Zhangmude[4] = 0;
-					if (data_next[i] == 255) Zhangmude[5] = 1;
-					else  Zhangmude[5] = 0;
-					if (data_next[i - 1] == 255) Zhangmude[6] = 1;
-					else  Zhangmude[6] = 0;
-					if (data[i - 1] == 255) Zhangmude[7] = 1;
-					else  Zhangmude[7] = 0;
-					if (data_last[i - 1] == 255) Zhangmude[8] = 1;
-					else  Zhangmude[8] = 0;
-					int whitepointtotal = 0;
-					for (int k = 1; k < 9; k++)
-					{
-						whitepointtotal = whitepointtotal + Zhangmude[k];
-					}
-					if ((whitepointtotal >= 2) && (whitepointtotal <= 6))
-					{
-						int ap = 0;
-						if ((Zhangmude[1] == 0) && (Zhangmude[2] == 1)) ap++;
-						if ((Zhangmude[2] == 0) && (Zhangmude[3] == 1)) ap++;
-						if ((Zhangmude[3] == 0) && (Zhangmude[4] == 1)) ap++;
-						if ((Zhangmude[4] == 0) && (Zhangmude[5] == 1)) ap++;
-						if ((Zhangmude[5] == 0) && (Zhangmude[6] == 1)) ap++;
-						if ((Zhangmude[6] == 0) && (Zhangmude[7] == 1)) ap++;
-						if ((Zhangmude[7] == 0) && (Zhangmude[8] == 1)) ap++;
-						if ((Zhangmude[8] == 0) && (Zhangmude[1] == 1)) ap++;
-						if (ap == 1)
-						{
-							if ((Zhangmude[1] * Zhangmude[7] * Zhangmude[5] == 0) && (Zhangmude[3] * Zhangmude[5] * Zhangmude[7] == 0))
-							{
-								deletelist1.push_back(Point(i, j));
-							}
-						}
-					}
-				}
-			}
-		}
-		if (deletelist1.size() == 0) break;
-		for (size_t i = 0; i < deletelist1.size(); i++)
-		{
-			Point tem;
-			tem = deletelist1[i];
-			uchar* data = srcimage.ptr<uchar>(tem.y);
-			data[tem.x] = 0;
-		}
-		deletelist1.clear();
 
-		for (int j = 1; j < (nl - 1); j++)
-		{
-			uchar* data_last = srcimage.ptr<uchar>(j - 1);
-			uchar* data = srcimage.ptr<uchar>(j);
-			uchar* data_next = srcimage.ptr<uchar>(j + 1);
-			for (int i = 1; i < (nc - 1); i++)
-			{
-				if (data[i] == 255)
-				{
-					Zhangmude[0] = 1;
-					if (data_last[i] == 255) Zhangmude[1] = 1;
-					else  Zhangmude[1] = 0;
-					if (data_last[i + 1] == 255) Zhangmude[2] = 1;
-					else  Zhangmude[2] = 0;
-					if (data[i + 1] == 255) Zhangmude[3] = 1;
-					else  Zhangmude[3] = 0;
-					if (data_next[i + 1] == 255) Zhangmude[4] = 1;
-					else  Zhangmude[4] = 0;
-					if (data_next[i] == 255) Zhangmude[5] = 1;
-					else  Zhangmude[5] = 0;
-					if (data_next[i - 1] == 255) Zhangmude[6] = 1;
-					else  Zhangmude[6] = 0;
-					if (data[i - 1] == 255) Zhangmude[7] = 1;
-					else  Zhangmude[7] = 0;
-					if (data_last[i - 1] == 255) Zhangmude[8] = 1;
-					else  Zhangmude[8] = 0;
-					int whitepointtotal = 0;
-					for (int k = 1; k < 9; k++)
-					{
-						whitepointtotal = whitepointtotal + Zhangmude[k];
-					}
-					if ((whitepointtotal >= 2) && (whitepointtotal <= 6))
-					{
-						int ap = 0;
-						if ((Zhangmude[1] == 0) && (Zhangmude[2] == 1)) ap++;
-						if ((Zhangmude[2] == 0) && (Zhangmude[3] == 1)) ap++;
-						if ((Zhangmude[3] == 0) && (Zhangmude[4] == 1)) ap++;
-						if ((Zhangmude[4] == 0) && (Zhangmude[5] == 1)) ap++;
-						if ((Zhangmude[5] == 0) && (Zhangmude[6] == 1)) ap++;
-						if ((Zhangmude[6] == 0) && (Zhangmude[7] == 1)) ap++;
-						if ((Zhangmude[7] == 0) && (Zhangmude[8] == 1)) ap++;
-						if ((Zhangmude[8] == 0) && (Zhangmude[1] == 1)) ap++;
-						if (ap == 1)
-						{
-							if ((Zhangmude[1] * Zhangmude[3] * Zhangmude[5] == 0) && (Zhangmude[3] * Zhangmude[1] * Zhangmude[7] == 0))
-							{
-								deletelist1.push_back(Point(i, j));
-							}
-						}
-					}
-				}
-			}
-		}
-		if (deletelist1.size() == 0) break;
-		for (size_t i = 0; i < deletelist1.size(); i++)
-		{
-			Point tem;
-			tem = deletelist1[i];
-			uchar* data = srcimage.ptr<uchar>(tem.y);
-			data[tem.x] = 0;
-		}
-		deletelist1.clear();
-	}
-}
 
 
 //图像保存
@@ -461,57 +308,61 @@ void create_jpg(bi_hua * bi, Mat & srcimage,string path)
 	imwrite(path, srcimage);
 }
 
-void get_bihua(const char path[100]) //获得二值图像  
+void get_bihua(string path,string distpath) //获得二值图像  
 {
 	Mat src;
 	Mat src2;
 
 	std::vector<Mat> channels;
 	src = imread(path);
-	//src2.create(src.size(), src.type());
-	//存储r
-	int **array1;
-	array1 = new int *[src.rows];
-	for (int i = 0; i<src.rows; ++i)
-		array1[i] = new int[src.cols];
 
-	int **array2;
-	array2 = new int *[src.rows];
-	for (int i = 0; i<src.rows; ++i)
-		array2[i] = new int[src.cols];
+
 
 	split(src, channels);
 	src2 = channels.at(1);
+	resize(src2, src2, Size(max_size, max_size), (0, 0), (0, 0), INTER_LINEAR);
+
+	//存储r
+	int **array1;
+	array1 = new int *[src2.rows];
+	for (int i = 0; i<src2.rows; ++i)
+		array1[i] = new int[src2.cols];
+
+	int **array2;
+	array2 = new int *[src2.rows];
+	for (int i = 0; i<src2.rows; ++i)
+		array2[i] = new int[src2.cols];
 
 	/*图像单值化处理*/
-	for (int row = 0; row < src2.rows; row++)
-	{
-		for (int col = 0; col < src2.cols; col++)
-		{
-
-			int b = src2.at<uchar>(row, col);
-			array1[row][col] = b;
-			if (array1[row][col] < 30)
+			for (int row = 0; row < src2.rows; row++)
 			{
-				src2.at<uchar>(row, col) = 255;
-				array2[row][col] = 1;
-				std::cout << '1';
+				for (int col = 0; col < src2.cols; col++)
+				{
+
+					int b = src2.at<uchar>(row, col);
+					array1[row][col] = b;
+					if (array1[row][col] < 55)
+					{
+						src2.at<uchar>(row, col) = 255;
+						array2[row][col] = 1;
+						//std::cout << '1';
+					}
+
+					else
+					{
+						src2.at<uchar>(row, col) = 0;
+
+						array2[row][col] = 0;
+						//std::cout << '0';
+					}
+				}
+				//std::cout << endl;
 			}
+	//get_border(array2,src.rows,src.cols);
+	//std::cout << endl;
+	//line_member.print_line();  
 
-			else
-			{
-				src2.at<uchar>(row, col) = 0;
-
-				array2[row][col] = 0;
-				std::cout << '0';
-			}
-		}
-		std::cout << endl;
-	}
-	get_border(array2,src.rows,src.cols);
-	std::cout << endl;
-	line_member.print_line();  
-
+	
 	//调用细化算法1
 	imshow("3",src2);
 	zhang_thinimage_improve(src2);
@@ -522,9 +373,6 @@ void get_bihua(const char path[100]) //获得二值图像
 	img_print_test my_print;
 	my_print.single_img_print(src2);
 
-	//保存图像
-	imwrite(dst_bit_path,src2);
-	imshow("4", src2);
 
 	// 调用笔画获取的主函数
 	bi_hua * my_bi; //获得笔画骨架
@@ -540,7 +388,7 @@ void get_bihua(const char path[100]) //获得二值图像
 		}
 	//将笔画骨架还原
 	get_before(my_bi, array3);
-	/*保存笔画到图片*/
+
 	//去掉重复笔画
 	my_bi = head;
 	int rd = 1;
@@ -551,94 +399,36 @@ void get_bihua(const char path[100]) //获得二值图像
 		Mat srcf(max_size,max_size, CV_8UC1);
 		string my_path;
 		sprintf(str, "%d",rd);
-		my_path = bi_hua_path + str + ".jpg";
+		my_path = distpath + str + ".jpg";
 		cout << my_path;
 		rd++;
 		create_jpg(my_bi,srcf,my_path);
 		my_bi = my_bi->next;
 	}
-
-}
-
-void get_binary_file(const char  filename1[100], const char filename2[100]) //获得二进制文件
-{
-	FILE *fpw = fopen(filename2, "wb");
-	if (fpw == NULL)
+	
+	for (int i = 0; i < src2.rows; ++i)
 	{
-		cout << "Open error!" << endl;
-		fclose(fpw);
-		return;
+		delete[]array1[i];
+		delete[]array2[i];
 	}
-
-	Mat image = imread(filename1);
-	if (!image.data || image.channels() != 3)
-	{
-		cout << "Image read failed or image channels isn't equal to 3."
-			<< endl;
-		return;
-	}
-
-	// write image to binary format file
-	int labelw = 1;
-	int rows = image.rows;
-	int cols = image.cols;
-
-	fwrite(&labelw, sizeof(char), 1, fpw);
-
-	char* dp = (char*)image.data;
-	for (int i = 0; i<rows*cols; i++)
-	{
-		fwrite(&dp[i * 3], sizeof(char), 1, fpw);
-		fwrite(&dp[i * 3 + 1], sizeof(char), 1, fpw);
-		fwrite(&dp[i * 3 + 2], sizeof(char), 1, fpw);
-	}
-	fclose(fpw);
-
-	// read image from binary format file
-	FILE *fpr = fopen(filename2, "rb");
-	if (fpr == NULL)
-	{
-		cout << "Open error!" << endl;
-		fclose(fpr);
-		return;
-	}
-
-	int labelr(0);
-	fread(&labelr, sizeof(char), 1, fpr);
-
-	cout << "label: " << labelr << endl;
-
-	Mat image2(rows, cols, CV_8UC3, Scalar::all(0));
-
-	char* pData = (char*)image2.data;
-	for (int i = 0; i<rows*cols; i++)
-	{
-		fread(&pData[i * 3], sizeof(char), 1, fpr);
-		fread(&pData[i * 3 + 1], sizeof(char), 1, fpr);
-		fread(&pData[i * 3 + 2], sizeof(char), 1, fpr);
-	}
-	fclose(fpr);
-
-	imshow("1", image2);
-
 }
 
 
-int new_img(const char path[100]) //获得灰度图像
+
+
+string new_img(string path,string midpath) //获得灰度图像
 {
 	Mat src, dst;
-	ofstream fe("D://Users//hubaba//workplace//jpg//1.txt");
-	ofstream fe2("D://Users//hubaba//workplace//jpg//2.txt");
 	src = imread(path);
 	if (src.empty())
 	{
 		printf("can not load image \n");
-		return -1;
+		assert(src.empty());
 	}
 	
 
-	namedWindow("input");
-	imshow("input", src);
+	//namedWindow("input");
+	//imshow("input", src);
 
 	dst.create(src.size(), src.type());
 
@@ -650,7 +440,7 @@ int new_img(const char path[100]) //获得灰度图像
 			int g = src.at<Vec3b>(row, col)[1];
 			int r = src.at<Vec3b>(row, col)[2];
 			//cout<<row<<' ' << b << g<< r <<' '<<col<< endl;
-			fe <<'('<< b << ','<<g<<',' << r <<')'<<'\t';
+			//fe <<'('<< b << ','<<g<<',' << r <<')'<<'\t';
 
 
 			dst.at<Vec3b>(row, col)[0] = max(r, max(g, b)); //图形灰度处理
@@ -661,31 +451,53 @@ int new_img(const char path[100]) //获得灰度图像
 			int b1 = dst.at<Vec3b>(row, col)[0]; //获得灰度处理图像的bgr
 			int g1 = dst.at<Vec3b>(row, col)[1];
 			int r1 = dst.at<Vec3b>(row, col)[2];
-			fe2 << '('<<b1 << ',' << g1<< ',' << r1<<')'<<'\t';
+			//fe2 << '('<<b1 << ',' << g1<< ',' << r1<<')'<<'\t';
 		}
-		fe <<row<<"over"<< endl;
-		fe2 <<row<<"over"<< endl;
+		//fe <<row<<"over"<< endl;
+		//fe2 <<row<<"over"<< endl;
 	}
-	imwrite(src_output_path, dst);
-	namedWindow("output");
-	imshow("output", dst);
-
+	string outfile = midpath + "test.jpg";
+	imwrite(outfile, dst);
+	//namedWindow("output");
+	//imshow("output", dst);
+	return outfile;
 }
 
 
-int main()
+void do_img(string srcpath,string midpath,string distpath)
 {
-
+	string outfile;
 	//像素操作
-	new_img(src_input_path);
-  //get_binary_file("D://Users//hubaba//workplace//jpg//4.jpg", "D://Users//hubaba//workplace//jpg//1.bin");
-	get_bihua(src_output_path);
+	outfile = new_img(srcpath,midpath);
+
+	get_bihua(outfile,distpath);
 
 
 	/*Mat bit_img;
 	bit_img = imread(dst_bit_path);
 	do_main(bit_img);
 	*/
-	waitKey();
 
+}
+
+
+
+
+
+//汉字笔画提取
+
+int main(int argc,char * argv[])
+{
+	if (argc >= 3)
+	{
+		std::cout << "请输入图片的源文件夹位置,中间生成文件位置，目标文件夹位置" << endl;
+	}
+	else
+	{
+		string srcpath = "D:\\Users\\hubaba\\workplace\\jpg\\3.jpg";
+		string midpath = "D:\\Users\\hubaba\\workplace\\jpg\\";
+		string distpath = "D:\\Users\\hubaba\\workplace\\bi\\";
+		do_img(srcpath, midpath, distpath);
+		
+	}
 }

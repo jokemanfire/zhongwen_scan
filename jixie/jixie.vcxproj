@@ -74,8 +74,8 @@
     <LibraryPath>D:\Users\qixiebi\opencv\build\x64\vc14\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>D:\Users\qixiebi\opencv\build\include;D:\Users\qixiebi\opencv\build\include\opencv;D:\Users\qixiebi\opencv\build\include\opencv2;C:\OpenSSL-Win64\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\OpenSSL-Win64\lib;D:\Users\qixiebi\opencv\build\x64\vc14\lib;D:\Users\qixiebi\opencv\build\x86\vc14\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files %28x86%29\Windows Kits\10\Include\10.0.17763.0\ucrt;D:\Users\qixiebi\opencv\build\include;D:\Users\qixiebi\opencv\build\include\opencv;D:\Users\qixiebi\opencv\build\include\opencv2;C:\OpenSSL-Win64\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Users\qixiebi\opencv\build\x64\vc14\lib;D:\Users\qixiebi\opencv\build\x86\vc14\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -95,8 +95,8 @@
     </ClCompile>
     <Link />
     <Link>
-      <AdditionalDependencies>libeay32.lib;ssleay32.lib;opencv_calib3d2413d.lib;opencv_contrib2413d.lib;opencv_core2413d.lib;opencv_features2d2413d.lib;opencv_flann2413d.lib;opencv_gpu2413d.lib;opencv_highgui2413d.lib;opencv_imgproc2413d.lib;opencv_legacy2413d.lib;opencv_ml2413d.lib;opencv_nonfree2413d.lib;opencv_photo2413d.lib;opencv_objdetect2413d.lib;opencv_ocl2413d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <StackReserveSize>1024111110</StackReserveSize>
+      <AdditionalDependencies>opencv_calib3d2413d.lib;opencv_contrib2413d.lib;opencv_core2413d.lib;opencv_features2d2413d.lib;opencv_flann2413d.lib;opencv_gpu2413d.lib;opencv_highgui2413d.lib;opencv_imgproc2413d.lib;opencv_legacy2413d.lib;opencv_ml2413d.lib;opencv_nonfree2413d.lib;opencv_photo2413d.lib;opencv_objdetect2413d.lib;opencv_ocl2413d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <StackReserveSize>100000000</StackReserveSize>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -132,17 +132,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="bihua.cpp" />
-    <ClCompile Include="check.cpp" />
     <ClCompile Include="do_fitting.cpp" />
-    <ClCompile Include="http_post.cpp" />
-    <ClCompile Include="signed.cpp" />
+    <ClCompile Include="feature.cpp" />
     <ClCompile Include="the_main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bihua.h" />
     <ClInclude Include="do_fitting.h" />
-    <ClInclude Include="http_post.h" />
-    <ClInclude Include="signed.h" />
+    <ClInclude Include="feature.h" />
     <ClInclude Include="the_main.h" />
   </ItemGroup>
   <ItemGroup>
