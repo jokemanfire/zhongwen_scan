@@ -44,7 +44,7 @@ double * do_fitting(int arry1[max_size][max_size])
 				array1[k] = i;
 				array2[k] = j;
 				k++;
-				cout << i << j << "  ";
+				//cout << i << j << "  ";
 				break;
 			}
 			if (k >= counts)
@@ -67,7 +67,14 @@ double * do_fitting(int arry1[max_size][max_size])
 	//{
 	//if( isnan(coefficient[i]) == 1 )
 	// }
-	printf("拟合方程为：y = %lf + %lfx + %lfx^2 \n", coefficient[1], coefficient[2], coefficient[3]);
+	//printf("拟合方程为：y = %lf + %lfx + %lfx^2 \n", coefficient[1], coefficient[2], coefficient[3]);
+
+	/*释放空间*/
+	
+		delete[]array1;
+		delete[]array2;
+
+	
 	return coefficient;
 }
 

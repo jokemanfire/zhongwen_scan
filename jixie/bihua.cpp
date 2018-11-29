@@ -51,8 +51,6 @@ bi_hua * delete_self(bi_hua * head)
 		}
 		else
 		{
-			temp->before = NULL;
-			delete head;
 			return temp;
 		}
 	}
@@ -314,14 +312,19 @@ bool is_fittingTrue(int array1[][max_size], int array2[][max_size],int flag=1)
 			sume3 += fabs(out_p3 - array1_2[j]);
 		}
 
-		std::cout << "Ò»·½³ÌÓëÔ­·½³Ì²î:" << fabs(sume1) / counts1 << endl;
+		delete[] array1_1;
+		delete[] array1_2;
+		delete[] array2_1;
+		delete[] array2_2;
+		/*std::cout << "Ò»·½³ÌÓëÔ­·½³Ì²î:" << fabs(sume1) / counts1 << endl;
 		std::cout << "¶þ·½³ÌÓëÔ­·½³ÌµÄ²î:" << fabs(sume2) / counts2 << endl;
 		std::cout << "Ò»·½³ÌÓë¶þ·½³Ì²î:" << fabs(sume) / min(counts2,counts1) << endl;
 		std::cout << "¶þ·½³ÌÓëÒ»·½³Ì²î:" << fabs(sume3) / min(counts2, counts1) << endl;
 		std::cout << "×Ü²îÎª:" << max(fabs(fabs(sume1) / counts1 - fabs(sume) / min(counts2, counts1)), fabs(fabs(sume2) / counts1 - fabs(sume3) / min(counts2, counts1))) << endl;
+		*/
 		if (fabs(sume1) / counts1 > 1||fabs(sume2)/counts2>1)
 			return false;
-		if (max(fabs(fabs(sume1) / counts1 - fabs(sume) / min(counts2, counts1)), fabs(fabs(sume2) / counts1 - fabs(sume3) / min(counts2, counts1))) <11) //ÉèÖÃÎó²îãÐÖµ
+		if (max(fabs(fabs(sume1) / counts1 - fabs(sume) / min(counts2, counts1)), fabs(fabs(sume2) / counts1 - fabs(sume3) / min(counts2, counts1))) <5) //ÉèÖÃÎó²îãÐÖµ
 			return true;
 		else
 			return false;
@@ -341,13 +344,15 @@ bool is_fittingTrue2(bi_hua * bi1,bi_hua * bi2)
 		return false;
 }
 
-void combine_bihua2(bi_hua * const yuan1, bi_hua * const yuan2)//¶ÔË®Æ½·½ÏòºÏ²¢
+void combine_bihua2(bi_hua * const yuan1, bi_hua * const yuan2,int flag)//¶ÔË®Æ½·½ÏòºÏ²¢
 {
 	bi_hua * now_bi = yuan1;
 	bi_hua * now_bi1 = yuan2;
 	bi_hua * second_bi = yuan1;
 	bi_hua * second_bi1 = yuan2;//yuan1ÓÐ½»µã£¬yuan2ÎÞ½»µã
 
+
+	
 	if (now_bi->head == 1)
 	{
 		now_bi = now_bi->next;
@@ -357,15 +362,17 @@ void combine_bihua2(bi_hua * const yuan1, bi_hua * const yuan2)//¶ÔË®Æ½·½ÏòºÏ²¢
 		now_bi1 = now_bi1->next;
 	}
 
-	while (now_bi != NULL && now_bi1 != NULL)
+	while (now_bi != NULL && now_bi1 != NULL)//&& now_bi->flag != 0&& now_bi1->flag!=0)
 	{
 		int cover = 0;
+		//´æ´¢now_bi±êÖ¾Î»
+		int status = now_bi->status;
 		//¸ønow_biËùÖ¸µÄÉÏËø
 		if (now_bi->flag == 1)
 		{
-			now_bi->flag = 0;
-			now_bi1->flag = 0;
-			cover = 1;
+			now_bi->flag -= 1;
+			now_bi1->flag -= 1;
+			cover += 1;
 		}
 
 		second_bi = yuan1;
@@ -380,22 +387,24 @@ void combine_bihua2(bi_hua * const yuan1, bi_hua * const yuan2)//¶ÔË®Æ½·½ÏòºÏ²¢
 				if (second_bi != now_bi && is_fittingTrue2(now_bi1, second_bi1))
 				{
 
-					if (is_in(now_bi, second_bi) == true && second_bi->flag == 1 && second_bi1->flag == 1)
+					if (is_in(now_bi, second_bi) == true && second_bi->flag == 1 && second_bi1->flag == 1&& second_bi->status == 1&& second_bi1->status==1)
 					{
-						if (second_bi->status == 1 && now_bi->status == 1)
-						{
+
 							*now_bi = *second_bi;
 							*now_bi1 = *second_bi1;
 							second_bi = delete_self(second_bi);
 							second_bi1 = delete_self(second_bi1);
+								
 							second_bi->flag = 0; //¼ÓËø
 							second_bi1->flag = 0;
 
-							combine_bihua2(yuan1, yuan2);
+							combine_bihua2(yuan1, yuan2,flag+1);
 
-							second_bi->flag = 1; //½âËø
-							second_bi1->flag = 1;
-						}
+							if (second_bi != now_bi)
+							{
+								second_bi->flag = 1; //½âËø
+								second_bi1->flag = 1;
+							}
 
 					}
 				}
@@ -407,8 +416,8 @@ void combine_bihua2(bi_hua * const yuan1, bi_hua * const yuan2)//¶ÔË®Æ½·½ÏòºÏ²¢
 		//¸ønow_biËùÖ¸½âËø
 		if (cover == 1)
 		{
-			now_bi->flag = 1;
-			now_bi1->flag = 1;
+			now_bi->flag += 1;
+			now_bi1->flag += 1;
 		}
 
 		now_bi1 = now_bi1->next;
@@ -468,9 +477,11 @@ void combine_bihua( bi_hua * const yuan1,bi_hua * const yuan2,int a_flag=1)  //¶
 						second_bi1->flag = 0;
 
 						combine_bihua(yuan1, yuan2);
-
-						second_bi->flag = 1; //½âËø
-						second_bi1->flag = 1;
+						if (second_bi != now_bi)
+						{
+							second_bi->flag = 1; //½âËø
+							second_bi1->flag = 1;
+						}
 
 					}
 				}
@@ -519,6 +530,8 @@ bool is_none(bi_hua * bi)
 {
 	bi_hua * had=bi;
 	int count = 0;
+	if (bi->head == 1)
+		return true;
 	for (int i = 0; i <max_size; i++)
 		for (int j = 0; j < max_size; j++)
 			if (had->self[i][j] == 1)
@@ -673,8 +686,8 @@ void print_bihua2(bi_hua * head)
 			std::cout << endl;
 		}
 		std::cout << "¸Ã±Ú»­½áÊø" << endl;
-	
 }
+
 //µÃµ½ÖÜÎ§8µãµÄÈ¨Öµ²»°üÀ¨±ê¼ÇÎª2µÄµã
 int count_point(one_room new_room)
 {
@@ -776,7 +789,7 @@ bi_hua * do_main(Mat &srcimage) //´«µÝµÄÎªµ¥Í¨µÀÍ¼Ïñ
 				array1[i][j] = 2;
 			}
 		}
-		std::cout << endl;
+		//std::cout << endl;
 	}
 
 	/*½«½»µãÌáÈ¡ºóµÄÁãÉ¢µã·ÅÈë*/
@@ -792,7 +805,8 @@ bi_hua * do_main(Mat &srcimage) //´«µÝµÄÎªµ¥Í¨µÀÍ¼Ïñ
 		}
 
 	/*´òÓ¡É¾³ýºóµÄ*/
-	for (int i = 0; i < row; i++)
+	
+	/*for (int i = 0; i < row; i++)
 	{
 		for (int j = 0; j < col; j++)
 		{
@@ -805,7 +819,7 @@ bi_hua * do_main(Mat &srcimage) //´«µÝµÄÎªµ¥Í¨µÀÍ¼Ïñ
 		}
 		std::cout << endl;
 	}
-	
+	*/
 	
 	/*±Ê»­ÌáÈ¡   ¸ÃÌáÈ¡±Ê»­ÎªÁãÉ¢µÄ*/
 	bi_hua * new_bi;
@@ -831,7 +845,7 @@ bi_hua * do_main(Mat &srcimage) //´«µÝµÄÎªµ¥Í¨µÀÍ¼Ïñ
 	
 	head = new_bi;
 	old_head = old_bi;
-
+	
 	for (int i = 0; i < row; i++)
 	{
 		for (int j = 0; j < col; j++)
@@ -844,7 +858,8 @@ bi_hua * do_main(Mat &srcimage) //´«µÝµÄÎªµ¥Í¨µÀÍ¼Ïñ
 			}
 		}
 	}
-	new_bi = head;
+	new_bi = head->next;
+	
 	while (new_bi != NULL)
 	{
 
@@ -939,12 +954,36 @@ bi_hua * do_main(Mat &srcimage) //´«µÝµÄÎªµ¥Í¨µÀÍ¼Ïñ
 
 
 
-	std::cout << "ºÏ²¢¿ªÊ¼:" << endl;
+	//std::cout << "ºÏ²¢¿ªÊ¼:" << endl;
 	combine_bihua(now_bi->before, jisuan_old_bi->before);
-	combine_bihua2(now_bi->before, jisuan_old_bi->before);
+	combine_bihua2(now_bi->before, jisuan_old_bi->before,1);
 
-	/*print ²âÊÔ*/
+	/*ÊÍ·Å¿Õ¼ä*/
+	bi_hua * my_bi = really_old;
+	bi_hua * bi_next = my_bi->next;
+	if (my_bi->next == NULL)
+		return really_head;
+	while (my_bi != NULL)
+	{
+		if (my_bi->next != NULL)
+		{
+			bi_next = my_bi->next;
+		}
+		else if (my_bi->next == NULL)
+		{
+			delete my_bi;
+			return really_head;
+		}
+		delete my_bi;
+		my_bi = bi_next;
+	}
 
+
+	for (int i = 0; i < max_size; ++i)
+	{
+		delete[]array1[i];
+		delete[]array2[i];
+	}
 	//std::cout << "end" << endl;
 	return really_head;
 }
@@ -1037,5 +1076,6 @@ void get_before(bi_hua * head, int array2[max_size][max_size] )
 		do_head = do_head->next;
 	}
 	//print_bihua(head);
-
+	for (int i = 0; i < max_size; i++)
+		array1[i].clear();
 }

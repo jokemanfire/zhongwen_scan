@@ -7,7 +7,10 @@
 
 /*img_print class*/
 
-
+class img_operate {
+public:
+	void do_img(string srcpath, string midpath, string distpath);
+};
 void img_print_test::single_img_print(Mat & src2)
 {
 	for (int row = 0; row < src2.rows; row++)
@@ -35,7 +38,7 @@ public:
 	void get_line(int flag,int x1, int x2, int y1, int y2 );
 	void print_line()
 	{
-		cout << "水平方向为:"<<endl;
+		/*cout << "水平方向为:"<<endl;
 		cout << "start:";
 		cout << level.get_sx() << "," << level.get_sy() << endl;
 		cout << "end:";
@@ -46,8 +49,11 @@ public:
 		cout << "end:";
 		cout << vechel.get_ex() << "," << vechel.get_ey() << endl;
 		cout << "顶点坐标:";
-		cout << level.get_sx() << "," << vechel.get_sy() << endl;
+		cout << level.get_sx() << "," << vechel.get_sy() << endl;*/
+		dis_x = level.get_sx();
+		dis_y = vechel.get_sy();
 	}
+	int dis_x=0, dis_y=0;
 private:
 	lines level;
 	lines vechel;
@@ -341,7 +347,7 @@ void get_bihua(string path,string distpath) //获得二值图像
 
 					int b = src2.at<uchar>(row, col);
 					array1[row][col] = b;
-					if (array1[row][col] < 55)
+					if (array1[row][col] < 150)  //调整阈值
 					{
 						src2.at<uchar>(row, col) = 255;
 						array2[row][col] = 1;
@@ -358,20 +364,19 @@ void get_bihua(string path,string distpath) //获得二值图像
 				}
 				//std::cout << endl;
 			}
-	//get_border(array2,src.rows,src.cols);
-	//std::cout << endl;
-	//line_member.print_line();  
+
 
 	
 	//调用细化算法1
-	imshow("3",src2);
 	zhang_thinimage_improve(src2);
+	//imshow("3",src2);
+
 
 
 
 	//print
-	img_print_test my_print;
-	my_print.single_img_print(src2);
+	//img_print_test my_print;
+	//my_print.single_img_print(src2);
 
 
 	// 调用笔画获取的主函数
@@ -389,7 +394,6 @@ void get_bihua(string path,string distpath) //获得二值图像
 	//将笔画骨架还原
 	get_before(my_bi, array3);
 
-	//去掉重复笔画
 	my_bi = head;
 	int rd = 1;
 	char str[10000];
@@ -400,8 +404,32 @@ void get_bihua(string path,string distpath) //获得二值图像
 		string my_path;
 		sprintf(str, "%d",rd);
 		my_path = distpath + str + ".jpg";
-		cout << my_path;
+		//cout << my_path;
 		rd++;
+		//将每个笔画放入左上角顶点
+		for(int i= 0;i<max_size;i++)
+			for (int j = 0; j < max_size; j++)
+			{
+				array2[i][j] = my_bi->self[i][j];
+			}
+		get_border(array2, max_size, max_size);
+		//std::cout << endl;
+		line_member.print_line();
+
+		for (int i = 0; i < max_size; i++)
+			for (int j = 0; j < max_size; j++)
+			{
+				 my_bi->self[i][j]=0;
+			}
+		for(int i =line_member.dis_x;i<max_size;i++)
+			for (int j = line_member.dis_y; j < max_size; j++)
+			{
+				my_bi->self[i - line_member.dis_x][j - line_member.dis_y] = array2[i][j];
+			}
+		//print_bihua2(my_bi);
+
+
+		 //保存笔画
 		create_jpg(my_bi,srcf,my_path);
 		my_bi = my_bi->next;
 	}
@@ -410,6 +438,25 @@ void get_bihua(string path,string distpath) //获得二值图像
 	{
 		delete[]array1[i];
 		delete[]array2[i];
+	}
+
+	my_bi = head;
+	bi_hua * bi_next = my_bi->next;
+	if (my_bi->next == NULL)
+		return;
+	while (my_bi != NULL)
+	{
+		if (my_bi->next != NULL)
+		{
+			 bi_next = my_bi->next;
+		}
+		else if (my_bi->next == NULL)
+		{
+			delete my_bi;
+			return;
+		}
+		delete my_bi;
+		my_bi = bi_next;
 	}
 }
 
@@ -464,7 +511,7 @@ string new_img(string path,string midpath) //获得灰度图像
 }
 
 
-void do_img(string srcpath,string midpath,string distpath)
+void  img_operate:: do_img(string srcpath,string midpath,string distpath)
 {
 	string outfile;
 	//像素操作
@@ -480,6 +527,35 @@ void do_img(string srcpath,string midpath,string distpath)
 
 }
 
+//获取特定格式的文件名  
+void GetAllFormatFiles(string path, vector<string>& files, string format)
+{
+	//文件句柄    
+	long long   hFile = 0;
+	//文件信息    
+	struct _finddata_t fileinfo;
+	string p;
+	if ((hFile = _findfirst(p.assign(path).append("\\*" + format).c_str(), &fileinfo)) != -1)
+	{
+		do
+		{
+			if ((fileinfo.attrib &  _A_SUBDIR))
+			{
+				if (strcmp(fileinfo.name, ".") != 0 && strcmp(fileinfo.name, "..") != 0)
+				{
+					//files.push_back(p.assign(path).append("\\").append(fileinfo.name) );  
+					GetAllFormatFiles(p.assign(path).append("\\").append(fileinfo.name), files, format);
+				}
+			}
+			else
+			{
+				files.push_back(p.assign(path).append("\\").append(fileinfo.name));
+			}
+		} while (_findnext(hFile, &fileinfo) == 0);
+
+		_findclose(hFile);
+	}
+}
 
 
 
@@ -494,10 +570,59 @@ int main(int argc,char * argv[])
 	}
 	else
 	{
-		string srcpath = "D:\\Users\\hubaba\\workplace\\jpg\\3.jpg";
+		/*string filePath = "D:\\Users\\hubaba\\workplace\\HDWDB1.1trn\\HWDB1.1trn_gnt\\png\\傈335.png";
+		string midpath = "D:\\Users\\hubaba\\workplace\\jpg\\";
+		string distpath = "D:\\Users\\hubaba\\workplace\\bi\\傈335.png";
+		img_operate test;
+		test.do_img(filePath, midpath, distpath);*/
+
+
+
+
+		string filePath = "D:\\Users\\hubaba\\workplace\\HDWDB1.1trn\\HWDB1.1trn_gnt\\png\\";
 		string midpath = "D:\\Users\\hubaba\\workplace\\jpg\\";
 		string distpath = "D:\\Users\\hubaba\\workplace\\bi\\";
+		string distpath2;
+		string srcpath;
+		vector<string> files;
+		const char * distAll = "AllFiles.txt";
+
+		//读取所有格式为jpg的文件
+		string format = ".png";
+		GetAllFormatFiles(filePath, files, format);
+		ofstream ofn(distAll);
+		int size = files.size();
+		regex rg1(".+\\\\(.+).png");
+		for (int i = 0; i < size; i++)
+		{
+			ofn << files[i] << endl;
+			//cout << files[i] << endl;
+			smatch rr1;
+			if (regex_match(files[i], rr1, rg1) == 1)
+			{
+				distpath2 = distpath + rr1.str(1);
+				//cout << distpath2 << endl;
+				string echo = "md " + distpath2;
+				//cout << echo.c_str();
+				system(echo.c_str());
+				distpath2 = distpath2 + "\\"+rr1.str(1);
+				
+				srcpath = filePath + rr1.str(1)+".png";
+				cout << srcpath<<endl;
+				img_operate test;
+				test.do_img(srcpath, midpath, distpath2);
+				
+			}
+				
+		}
+
+		/*test
+		string srcpath = "D:\\Users\\hubaba\\workplace\\HDWDB1.1trn\\HWDB1.1trn_gnt\\png\\咯158.png";
+		string midpath = "D:\\Users\\hubaba\\workplace\\jpg\\";
+		string distpath = "D:\\Users\\hubaba\\workplace\\bi\\";
+	
 		do_img(srcpath, midpath, distpath);
+		*/
 		
 	}
 }

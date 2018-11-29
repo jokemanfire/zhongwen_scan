@@ -37,5 +37,7 @@ private:
 	int endp_x, endp_y;
 };
 
+void print_bihua2(bi_hua * head);
+
 
 
